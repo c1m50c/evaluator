@@ -1,6 +1,8 @@
 use term_painter::{Color::*, ToStyle};
 use std::io::{self, Write};
 
+mod tokenizer;
+
 
 /// Gets user input from the terminal, prompt hardcoded.
 fn get_input() -> String {
@@ -23,5 +25,7 @@ fn main() {
     loop {
         let inp = get_input();
         if inp.is_empty() { return; }
+
+        let mut tokenizer = tokenizer::Tokenizer::new(inp);
     }
 }
