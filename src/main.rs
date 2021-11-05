@@ -1,3 +1,27 @@
+use term_painter::{Color::*, ToStyle};
+use std::io::{self, Write};
+
+
+/// Gets user input from the terminal, prompt hardcoded.
+fn get_input() -> String {
+    let mut input: String = String::new();
+
+    /* Prompt */
+    print!("{}{}",
+        BrightMagenta.bold().paint("evalulator"),
+        BrightYellow.bold().paint(":$ "),
+    );
+
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut input)
+        .expect("Failed to read line.");
+    return input.trim().to_string();
+}
+
+
 fn main() {
-    println!("Hello, world!");
+    loop {
+        let inp = get_input();
+        if inp.is_empty() { return; }
+    }
 }
