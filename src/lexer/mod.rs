@@ -8,6 +8,7 @@ use token::Token;
 use std::{vec::Vec, option::Option};
 
 
+#[derive(Debug)]
 pub struct Lexer {
     characters: Vec<char>,
     position: usize,
@@ -53,6 +54,7 @@ impl Lexer {
             '-' => Token::Minus,
             '*' => Token::Star,
             '/' => Token::ForwardSlash,
+            '^' => Token::Caret,
 
             /* Types */
             _ if self.current_char.is_numeric() => {

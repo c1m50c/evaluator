@@ -15,6 +15,7 @@ pub enum Token {
     Minus,
     Star,
     ForwardSlash,
+    Caret,
 }
 
 
