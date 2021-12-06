@@ -1,4 +1,38 @@
-use super::lexer::token::Token;
+pub(crate) mod enums;
+
+
+use enums::Statement;
+use super::lexer::{token::Token, Lexer};
+use std::vec::Vec;
+
+
+pub type ParsedData = Vec<Statement>;
+
+
+pub struct Parser {
+    lexer: Lexer,
+}
+
+
+impl Parser {
+    #[inline(always)]
+    pub const fn new(lexer: Lexer) -> Self {
+        return Self {
+            lexer,
+        };
+    }
+
+    pub fn parse(&mut self) -> ParsedData {
+        let mut tokens: Vec<Token> = Vec::new();
+        let mut result: ParsedData = ParsedData::new();
+
+        while let Some(t) = self.lexer.next() {
+            tokens.push(t);
+        }
+
+        return result;
+    }
+}
 
 
 fn get_binding_power(token: Token) -> Option<(usize, usize)> {

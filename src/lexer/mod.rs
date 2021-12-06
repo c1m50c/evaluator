@@ -8,7 +8,7 @@ use token::Token;
 use std::{vec::Vec, option::Option};
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Lexer {
     characters: Vec<char>,
     position: usize,
