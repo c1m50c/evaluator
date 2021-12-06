@@ -5,7 +5,6 @@ pub(crate) mod token;
 
 
 use token::Token;
-use term_painter::{ToStyle, Color::*};
 use std::{vec::Vec, option::Option};
 
 
