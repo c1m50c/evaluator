@@ -1,3 +1,12 @@
+mod shell;
+
+
+use shell::input;
+
+
 fn main() {
-    println!("Hello, world!");
+    loop {
+        let inp: String = input();
+        if inp.is_empty() { break; }
+    }
 }
