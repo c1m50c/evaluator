@@ -2,13 +2,14 @@ use std::boxed::Box;
 use std::fmt;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Statement {
-    Arithmetic(Expression),
+    Arithmetic(Expression), // Arithmetic(ArithmeticExpression)
+    Command(String), // Command(String)
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ArithmeticOperation {
     Addition,
     Subtraction,
@@ -17,7 +18,7 @@ pub enum ArithmeticOperation {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     /* Mathematical */
     Arithmetic(Box<Expression>, ArithmeticOperation, Box<Expression>),

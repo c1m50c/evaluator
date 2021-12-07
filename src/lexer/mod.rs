@@ -1,6 +1,3 @@
-/*
-    TODO: Replace all panics with a function that kills the current shell iteration with an error.
-*/
 pub(crate) mod token;
 
 

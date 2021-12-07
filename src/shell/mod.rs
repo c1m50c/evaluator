@@ -1,5 +1,7 @@
+use super::parser::enums::{Statement, Expression};
 use term_painter::{ToStyle, Color::*};
 use std::io::{self, Write};
+use std::process::exit;
 
 
 /// Returns the Input from the Standard Input as a String.
@@ -16,4 +18,31 @@ pub fn input() -> String {
     io::stdin().read_line(&mut input)
         .expect("Failed to read line from standard input.");
     return input.trim().to_string();
+}
+
+
+pub fn evalulate(statement: Statement) {
+    match statement {
+        Statement::Arithmetic(x) => {
+            match x {
+                Expression::Arithmetic(a, operator, b) => {
+
+                },
+
+                _ => panic!("Arithmetic Statement does not contain an Arithmetic Expression."),
+            }
+        },
+
+        Statement::Command(x) => {
+            match x.to_lowercase().as_str() {
+                "quit" | "exit" => {
+                    exit(0);
+                },
+
+                _ => panic!("Unimplemented Command '{}'.", x),
+            }
+        },
+
+        _ => panic!("Unimplemented Statement."),
+    }
 }

@@ -1,12 +1,16 @@
+/*
+    TODO: Replace all panics with a function that kills the current shell iteration with an error.
+*/
+
 mod parser;
 mod lexer;
 mod shell;
 
 
 use term_painter::{ToStyle, Color::*};
+use shell::{input, evalulate};
 use parser::Parser;
 use lexer::Lexer;
-use shell::input;
 
 
 fn main() {
@@ -27,13 +31,17 @@ fn main() {
                 );
             }
 
-            for s in parsed_data {
+            for s in parsed_data.clone() {
                 println!("{} {}: {}",
                     Green.bold().paint("[ DEBUG ]"),
-                    Cyan.paint("Parsed Statement"),
+                    Cyan.paint("Parsing Statement"),
                     s
                 );
             }
+        }
+
+        for s in parsed_data {
+            evalulate(s);
         }
     }
 }
