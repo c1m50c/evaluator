@@ -69,6 +69,20 @@ impl Lexer {
                 else { panic!("Too many decimals within the Number '{}'.", string); }
             }
 
+            _ if self.current_char.is_alphabetic() => {
+                /* Word */
+                let mut string = String::new();
+                string.push(self.current_char);
+                self.read();
+
+                while self.position < self.characters.len() && self.current_char.is_alphabetic() {
+                    string.push(self.current_char);
+                    self.read();
+                }
+
+                Token::Word(string)
+            }
+
             _ => panic!("Unimplemented Token '{}'.", self.current_char),
         };
 

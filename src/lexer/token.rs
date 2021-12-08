@@ -5,6 +5,7 @@ use std::fmt;
 pub enum Token {
     /* Types */
     Number(String),
+    Word(String),
 
     /* Seperators */
     LeftParen,
