@@ -34,6 +34,7 @@ impl Parser {
         while let Some(t) = tokens.pop() {
             match t {
                 Token::Number(x) => {
+                    /* Arithmetic Statement */
                     // TODO: Support for multiple operations in same statement.
                     if let Ok(a) = x.parse::<f64>() {
                         let operator: ArithmeticOperation;
@@ -64,9 +65,10 @@ impl Parser {
                                 Token::Number(b) => {
                                     if let Ok(b) = b.parse::<f64>() {
                                         let expression = Expression::Arithmetic(
-                                            Box::new(Expression::Float(a)),
-                                            operator,
+                                            // NOTE: 'b' & 'a' need to be swapped like this for proper ordering, not sure why.
                                             Box::new(Expression::Float(b)),
+                                            operator,
+                                            Box::new(Expression::Float(a))
                                         );
     
                                         result.push(Statement::Arithmetic(expression));
@@ -98,6 +100,7 @@ impl Parser {
                 },
 
                 Token::Word(x) => {
+                    /* Command Statement */
                     result.push(Statement::Command(x));
                 },
 
