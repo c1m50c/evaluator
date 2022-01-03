@@ -6,6 +6,7 @@ use core::fmt;
 #[derive(Debug, Clone, Copy)]
 pub enum ShellError {
     EvaluationError,
+    ParsingError,
     SyntaxError,
 }
 

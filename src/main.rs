@@ -4,9 +4,10 @@ mod shell;
 
 
 use term_painter::{ToStyle, Color::*};
-use shell::{input, evalulate};
+use shell::eval::evaluate_statements;
 use parser::Parser;
 use lexer::Lexer;
+use shell::input;
 use std::thread;
 
 
@@ -38,9 +39,7 @@ fn main() {
                 }
             }
 
-            for s in parsed_data {
-                evalulate(s);
-            }
+            evaluate_statements(parsed_data);
         });
 
         let _ = execution_thread.join();

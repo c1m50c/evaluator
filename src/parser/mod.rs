@@ -3,6 +3,7 @@ pub(crate) mod enums;
 
 use enums::Statement;
 use super::lexer::{token::Token, Lexer};
+use super::shell::error::*;
 use std::vec::Vec;
 
 
@@ -28,6 +29,19 @@ impl Parser {
 
         while let Some(t) = self.lexer.next() {
             tokens.push(t);
+        }
+
+        for t in tokens {
+            match t {
+                Token::Word(x) => {
+                    result.push(Statement::Command(x));
+                },
+
+                _ => shell_panic(
+                    format!("Cannot parse token '{}'.", t).as_ref(),
+                    ShellError::ParsingError
+                ),
+            }
         }
 
         return result;
