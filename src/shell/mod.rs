@@ -1,7 +1,10 @@
+pub(crate) mod error;
+
 use super::parser::enums::{Statement, Expression};
 use term_painter::{ToStyle, Color::*};
 use std::io::{self, Write};
 use std::process::exit;
+use error::*;
 
 
 /// Returns the Input from the Standard Input as a String.
@@ -21,6 +24,7 @@ pub fn input() -> String {
 }
 
 
+#[allow(unreachable_patterns)]
 pub fn evalulate(statement: Statement) {
     match statement {
         Statement::Arithmetic(x) => {
@@ -29,7 +33,10 @@ pub fn evalulate(statement: Statement) {
 
                 },
 
-                _ => panic!("Arithmetic Statement does not contain an Arithmetic Expression."),
+                _ => shell_panic(
+                    "Arithmetic Statement does not contain an Arithmetic Expression.",
+                    ShellError::EvaluationError
+                ),
             }
         },
 
@@ -39,10 +46,16 @@ pub fn evalulate(statement: Statement) {
                     exit(0);
                 },
 
-                _ => panic!("Unimplemented Command '{}'.", x),
+                _ => shell_panic(
+                    format!("Unimplemented Command '{}'.", x).as_ref(),
+                    ShellError::EvaluationError
+                ),
             }
         },
 
-        _ => panic!("Unimplemented Statement."),
+        _ => shell_panic(
+            "Unimplemented Statement.",
+            ShellError::EvaluationError
+        ),
     }
 }

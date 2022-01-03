@@ -1,9 +1,3 @@
-/*
-    TODO: Replace all panics with a function that kills the current shell iteration with an error.
-        Could possibly do this by creating a thread for the execution of the current input, and killing it with a 
-        function that mimics the panic! macro. This is so the user does not have to restart the shell every error.
-*/
-
 mod parser;
 mod lexer;
 mod shell;

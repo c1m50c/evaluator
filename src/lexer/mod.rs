@@ -2,6 +2,7 @@ pub(crate) mod token;
 
 
 use token::Token;
+use super::shell::error::*;
 use std::{vec::Vec, option::Option};
 
 
@@ -66,7 +67,12 @@ impl Lexer {
                 }
 
                 if string.matches(".").count() <= 1 { Token::Number(string) }
-                else { panic!("Too many decimals within the Number '{}'.", string); }
+                else {
+                    shell_panic(
+                        format!("Too many decimals within the Number '{}'.", string).as_ref(),
+                        ShellError::SyntaxError
+                    );
+                }
             }
 
             _ if self.current_char.is_alphabetic() => {
@@ -83,7 +89,10 @@ impl Lexer {
                 Token::Word(string)
             }
 
-            _ => panic!("Unimplemented Token '{}'.", self.current_char),
+            _ => shell_panic(
+                format!("Unimplemented Token '{}'.", self.current_char).as_ref(),
+                ShellError::SyntaxError
+            ),
         };
 
         self.read();
