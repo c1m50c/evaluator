@@ -31,7 +31,7 @@ impl Parser {
             tokens.push(t);
         }
 
-        while let Some(t) = tokens.pop() {
+        while let Some(t) = pop_vec_front(&mut tokens) {
             match t {
                 Token::Number(x) => {
                     /* Arithmetic Statement */
@@ -39,7 +39,7 @@ impl Parser {
                     if let Ok(a) = x.parse::<f64>() {
                         let operator: ArithmeticOperation;
 
-                        if let Some(o) = tokens.pop() {
+                        if let Some(o) = pop_vec_front(&mut tokens) {
                             match o {
                                 Token::Plus => operator = ArithmeticOperation::Addition,
                                 Token::Minus => operator = ArithmeticOperation::Subtraction,
@@ -60,15 +60,14 @@ impl Parser {
                             );
                         }
 
-                        if let Some(b) = tokens.pop() {
+                        if let Some(b) = pop_vec_front(&mut tokens) {
                             match b {
                                 Token::Number(b) => {
                                     if let Ok(b) = b.parse::<f64>() {
                                         let expression = Expression::Arithmetic(
-                                            // NOTE: 'b' & 'a' need to be swapped like this for proper ordering, not sure why.
-                                            Box::new(Expression::Float(b)),
+                                            Box::new(Expression::Float(a)),
                                             operator,
-                                            Box::new(Expression::Float(a))
+                                            Box::new(Expression::Float(b))
                                         );
     
                                         result.push(Statement::Arithmetic(expression));
@@ -113,6 +112,14 @@ impl Parser {
 
         return result;
     }
+}
+
+
+/// Inverse of `Vec.pop()`, Pops the front element out of the vector.
+pub fn pop_vec_front<T>(vector: &mut Vec<T>) -> Option<T> {
+    // NOTE: How the hell is `pop_front()` not a basic method of `Vec`?
+    if vector.len() == 0 { return None; }
+    return Some(vector.remove(0));
 }
 
 
