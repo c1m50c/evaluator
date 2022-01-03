@@ -1,11 +1,12 @@
 use term_painter::{ToStyle, Color::*};
+use std::panic::set_hook;
 use core::fmt;
 
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ShellError {
-    SyntaxError,
     EvaluationError,
+    SyntaxError,
 }
 
 
@@ -17,7 +18,7 @@ impl fmt::Display for ShellError {
 
 
 /// Panics the execution thread of the shell, printing the `error` and the `message` to the standard output.
-/// Similar to the `panic!` macro, but without the backtrace.
+/// Similar to the `panic!` macro, but without the long print message associated with it.
 /// 
 /// ## Example:
 /// ```rust
@@ -30,9 +31,6 @@ pub fn shell_panic(message: &str, error: ShellError) -> ! {
         BrightWhite.paint(format!("{}", message))
     );
 
-    /*
-        FIXME:TODO:
-        Find way to panic without printing the panic, or a better way to kill the execution thread.
-    */
+    set_hook(Box::new( |_| {  } )); // To prevent `panic!` from printing anything.
     panic!();
 }
