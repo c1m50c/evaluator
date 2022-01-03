@@ -53,6 +53,7 @@ impl Lexer {
             '*' => Token::Star,
             '/' => Token::ForwardSlash,
             '^' => Token::Caret,
+            '%' => Token::Percent,
 
             /* Types */
             _ if self.current_char.is_numeric() => {

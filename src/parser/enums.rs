@@ -2,6 +2,7 @@ use std::boxed::Box;
 use std::fmt;
 
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum Statement {
     Arithmetic(Expression), // Arithmetic(ArithmeticExpression)
@@ -9,15 +10,18 @@ pub enum Statement {
 }
 
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum ArithmeticOperation {
     Addition,
     Subtraction,
     Multiplication,
     Division,
+    Modulo,
 }
 
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum Expression {
     /* Mathematical */

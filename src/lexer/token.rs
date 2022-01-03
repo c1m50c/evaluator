@@ -17,6 +17,7 @@ pub enum Token {
     Star,
     ForwardSlash,
     Caret,
+    Percent,
 }
 
 

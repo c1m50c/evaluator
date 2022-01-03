@@ -25,6 +25,7 @@ fn evalulate(statement: Statement) {
                             ArithmeticOperation::Subtraction => result = a - b,
                             ArithmeticOperation::Multiplication => result = a * b,
                             ArithmeticOperation::Division => result = a / b,
+                            ArithmeticOperation::Modulo => result = a % b,
 
                             _ => shell_panic(
                                 format!("Unimplemented Arithmetic Operation '{}'.", o).as_ref(),
