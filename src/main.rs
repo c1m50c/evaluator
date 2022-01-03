@@ -14,7 +14,7 @@ use std::thread;
 fn main() {
     loop {
         let inp: String = input();
-        if inp.is_empty() { break; }
+        if inp.is_empty() { continue; }
 
         let execution_thread = thread::spawn(move || {
             let mut lexer: Lexer = Lexer::new(inp.clone());

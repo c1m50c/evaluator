@@ -3,6 +3,7 @@ use std::panic::set_hook;
 use core::fmt;
 
 
+/// Enum representing errors for use in `shell_panic`.
 #[derive(Debug, Clone, Copy)]
 pub enum ShellError {
     EvaluationError,

@@ -1,7 +1,7 @@
 pub(crate) mod enums;
 
 
-use enums::Statement;
+use enums::*;
 use super::lexer::{token::Token, Lexer};
 use super::shell::error::*;
 use std::vec::Vec;
@@ -31,13 +31,80 @@ impl Parser {
             tokens.push(t);
         }
 
-        for t in tokens {
+        while let Some(t) = tokens.pop() {
             match t {
+                Token::Number(x) => {
+                    // TODO: Support for multiple operations in same statement.
+                    if let Ok(a) = x.parse::<f64>() {
+                        let operator: ArithmeticOperation;
+
+                        if let Some(o) = tokens.pop() {
+                            match o {
+                                Token::Plus => operator = ArithmeticOperation::Addition,
+                                Token::Minus => operator = ArithmeticOperation::Subtraction,
+                                Token::Star => operator = ArithmeticOperation::Multiplication,
+                                Token::ForwardSlash => operator = ArithmeticOperation::Division,
+                                Token::Percent => operator = ArithmeticOperation::Modulo,
+                                Token::Caret => operator = ArithmeticOperation::Pow,
+
+                                _ => shell_panic(
+                                    format!("Token '{}' is not a valid operator.", o).as_ref(),
+                                    ShellError::SyntaxError
+                                ),
+                            }
+                        } else {
+                            shell_panic(
+                                "Cannot retrieve next token in statement",
+                                ShellError::SyntaxError
+                            );
+                        }
+
+                        if let Some(b) = tokens.pop() {
+                            match b {
+                                Token::Number(b) => {
+                                    if let Ok(b) = b.parse::<f64>() {
+                                        let expression = Expression::Arithmetic(
+                                            Box::new(Expression::Float(a)),
+                                            operator,
+                                            Box::new(Expression::Float(b)),
+                                        );
+    
+                                        result.push(Statement::Arithmetic(expression));
+                                    } else {
+                                        shell_panic(
+                                            format!("Cannot convert '{}' to a 64-bit floating point number.", b).as_ref(),
+                                            ShellError::ParsingError
+                                        );
+                                    }
+                                }
+
+                                _ => shell_panic(
+                                    format!("Token '{}' is not a number.", b).as_ref(),
+                                    ShellError::SyntaxError
+                                ),
+                            }
+                        } else {
+                            shell_panic(
+                                "Cannot retrieve next token in statement",
+                                ShellError::SyntaxError
+                            );
+                        }
+                    } else {
+                        shell_panic(
+                            format!("Cannot convert '{}' to a 64-bit floating point number.", x).as_ref(),
+                            ShellError::ParsingError
+                        );
+                    }
+                },
+
                 Token::Word(x) => {
                     result.push(Statement::Command(x));
                 },
 
-                _ => {  }, // TODO: Upon completion of basic parsing replace this with a `shell_panic()`.
+                _ => shell_panic(
+                    format!("Cannot convert token '{}' into a statement.", t).as_ref(),
+                    ShellError::ParsingError
+                ),
             }
         }
 

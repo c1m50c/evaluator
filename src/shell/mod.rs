@@ -5,7 +5,9 @@ use term_painter::{ToStyle, Color::*};
 use std::io::{self, Write};
 
 
-/// Returns the Input from the Standard Input as a String.
+/// Returns the input from the Standard Input as a trimmed `String`.
+/// ## Panics:
+/// - If `io::stdin().read_line()` Fails.
 pub fn input() -> String {
     let mut input: String = String::new();
 

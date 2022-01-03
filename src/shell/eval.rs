@@ -11,6 +11,7 @@ pub fn evaluate_statements(data: ParsedData) {
 }
 
 
+/// Evaluates a given statement, processing it and handling its contents.
 #[allow(unreachable_patterns)]
 fn evalulate(statement: Statement) {
     match statement {

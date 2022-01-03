@@ -11,7 +11,7 @@ pub enum Statement {
 
 
 #[allow(dead_code)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum ArithmeticOperation {
     Addition,
     Subtraction,
