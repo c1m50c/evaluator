@@ -1,3 +1,4 @@
+use term_painter::{ToStyle, Color::*};
 use core::fmt;
 
 
@@ -24,10 +25,14 @@ impl fmt::Display for ShellError {
 /// // "SyntaxError: Something went wrong in lexical analysis." will be printed.
 /// ```
 pub fn shell_panic(message: &str, error: ShellError) -> ! {
-    println!("{}: {}", error, message);
+    println!("{}{}",
+        Red.bold().paint(format!("{}: ", error)),
+        BrightWhite.paint(format!("{}", message))
+    );
+
     /*
         FIXME:TODO:
-        Kill Thread on call, currently goes into a infinite loop without exiting.
+        Find way to panic without printing the panic, or a better way to kill the execution thread.
     */
-    loop {  }
+    panic!();
 }
