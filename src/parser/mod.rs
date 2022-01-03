@@ -37,10 +37,7 @@ impl Parser {
                     result.push(Statement::Command(x));
                 },
 
-                _ => shell_panic(
-                    format!("Cannot parse token '{}'.", t).as_ref(),
-                    ShellError::ParsingError
-                ),
+                _ => {  }, // TODO: Upon completion of basic parsing replace this with a `shell_panic()`.
             }
         }
 

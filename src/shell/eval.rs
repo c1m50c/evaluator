@@ -16,25 +16,26 @@ fn evalulate(statement: Statement) {
     match statement {
         Statement::Arithmetic(x) => {
             match x {
-                Expression::Arithmetic(a, o, b) => {
+                Expression::Arithmetic(a, operator, b) => {
                     let result;
                     
                     if let (Expression::Float(a), Expression::Float(b)) = (*a, *b) {
-                        match o {
+                        match operator {
                             ArithmeticOperation::Addition => result = a + b,
                             ArithmeticOperation::Subtraction => result = a - b,
                             ArithmeticOperation::Multiplication => result = a * b,
                             ArithmeticOperation::Division => result = a / b,
                             ArithmeticOperation::Modulo => result = a % b,
+                            ArithmeticOperation::Pow => result = a.powf(b),
 
                             _ => shell_panic(
-                                format!("Unimplemented Arithmetic Operation '{}'.", o).as_ref(),
+                                format!("Unimplemented Arithmetic Operation '{}'.", operator).as_ref(),
                                 ShellError::EvaluationError
                             ),
                         }
                     } else {
                         shell_panic(
-                            "Arithmetic Expression does not contain valid numbers for 'a' & 'b'.",
+                            "Arithmetic Expression does not contain valid numbers in both Expressions.",
                             ShellError::EvaluationError
                         );
                     }
@@ -53,6 +54,10 @@ fn evalulate(statement: Statement) {
             match x.to_lowercase().as_str() {
                 "quit" | "exit" => {
                     exit(0);
+                },
+
+                "help" | "h" => {
+                    // TODO: Print helpful information
                 },
 
                 _ => shell_panic(

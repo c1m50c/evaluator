@@ -18,6 +18,7 @@ pub enum ArithmeticOperation {
     Multiplication,
     Division,
     Modulo,
+    Pow,
 }
 
 
@@ -25,10 +26,10 @@ pub enum ArithmeticOperation {
 #[derive(Debug, Clone)]
 pub enum Expression {
     /* Mathematical */
-    Arithmetic(Box<Expression>, ArithmeticOperation, Box<Expression>),
+    Arithmetic(Box<Expression>, ArithmeticOperation, Box<Expression>), // Arithmetic(Box<Float>, ArithmeticOperation, Box<Float>)
     
     /* Types */
-    Float(f64),
+    Float(f64), // Float(f64)
 }
 
 
