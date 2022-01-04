@@ -24,14 +24,9 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> ParsedData {
-        let mut tokens: Vec<Token> = Vec::new();
         let mut result: ParsedData = ParsedData::new();
 
         while let Some(t) = self.lexer.next() {
-            tokens.push(t);
-        }
-
-        while let Some(t) = pop_vec_front(&mut tokens) {
             match t {
                 Token::Number(x) => {
                     /* Arithmetic Statement */
@@ -39,7 +34,7 @@ impl Parser {
                     if let Ok(a) = x.parse::<f64>() {
                         let operator: ArithmeticOperation;
 
-                        if let Some(o) = pop_vec_front(&mut tokens) {
+                        if let Some(o) = self.lexer.next() {
                             match o {
                                 Token::Plus => operator = ArithmeticOperation::Addition,
                                 Token::Minus => operator = ArithmeticOperation::Subtraction,
@@ -55,12 +50,12 @@ impl Parser {
                             }
                         } else {
                             shell_panic(
-                                "Cannot retrieve next token in statement",
+                                "Cannot retrieve next token in statement.",
                                 ShellError::SyntaxError
                             );
                         }
 
-                        if let Some(b) = pop_vec_front(&mut tokens) {
+                        if let Some(b) = self.lexer.next() {
                             match b {
                                 Token::Number(b) => {
                                     if let Ok(b) = b.parse::<f64>() {
@@ -86,7 +81,7 @@ impl Parser {
                             }
                         } else {
                             shell_panic(
-                                "Cannot retrieve next token in statement",
+                                "Cannot retrieve next token in statement.",
                                 ShellError::SyntaxError
                             );
                         }
@@ -112,14 +107,6 @@ impl Parser {
 
         return result;
     }
-}
-
-
-/// Inverse of `Vec.pop()`, Pops the front element out of the vector.
-pub fn pop_vec_front<T>(vector: &mut Vec<T>) -> Option<T> {
-    // NOTE: How the hell is `pop_front()` not a basic method of `Vec`?
-    if vector.len() == 0 { return None; }
-    return Some(vector.remove(0));
 }
 
 

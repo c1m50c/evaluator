@@ -9,6 +9,7 @@ pub enum ShellError {
     EvaluationError,
     ParsingError,
     SyntaxError,
+    UnknownError,
 }
 
 
@@ -35,4 +36,31 @@ pub fn shell_panic(message: &str, error: ShellError) -> ! {
 
     set_hook(Box::new( |_| {  } )); // To prevent `panic!` from printing anything.
     panic!();
+}
+
+
+/// Similar to `expect()` in `Option` but throws a `shell_panic()` instead.
+/// 
+/// ## Example:
+/// ```rust
+/// let some: Option<bool> = Some(true);
+/// let none: Option<bool> = None;
+/// 
+/// let some_true: bool = shell_expect_some(
+///     some,
+///     "This will be equal to `true`.",
+///     ShellError::UnknownError
+/// );
+/// 
+/// assert_eq!(some_true, true);
+/// 
+/// let this_will_panic: bool = shell_expect_some(
+///     none,
+///     "This will panic due to `none` being equal to `None`.",
+///     ShellError::UnkownError
+/// );
+/// ```
+pub fn shell_expect_some<T>(option: Option<T>, message: &str, error: ShellError) -> T {
+    if option.is_none() { shell_panic(message, error); }
+    return option.unwrap();
 }
