@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/c1m50c/evaluator/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/c1m50c/evaluator/actions/workflows/build.yml)
 
-A shell based evalulator just made for personal use. Can parse and execute mathematical statements as well as various commands.
+A shell based evaluator just made for personal use. Can parse and execute mathematical statements as well as various commands.
 
 
 ## **Running & Building**
@@ -29,3 +29,7 @@ $ ./target/release/evaluator # An example of running the application.
 ...
 ```
 </details>
+
+
+## **License**
+<a href="https://github.com/c1m50c/evaluator/blob/main/LICENSE">MIT License</a>
