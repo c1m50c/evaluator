@@ -64,3 +64,30 @@ pub fn shell_expect_some<T>(option: Option<T>, message: &str, error: ShellError)
     if option.is_none() { shell_panic(message, error); }
     return option.unwrap();
 }
+
+
+/// Similar to `expect()` in `Result` but throws a `shell_panic()` instead.
+/// 
+/// ## Example:
+/// ```rust
+/// let ok: Result<bool, ShellError> = Ok(true);
+/// let err: Result<bool, ShellError> = Err(ShellError::UnknownError);
+/// 
+/// let is_ok: bool = shell_expect_some(
+///     ok,
+///     "This will be equal to `true`.",
+///     ShellError::UnknownError
+/// );
+/// 
+/// assert_eq!(is_ok, true);
+/// 
+/// let this_will_panic: bool = shell_expect_some(
+///     err,
+///     "This will panic due to `err` being an Error.",
+///     ShellError::UnkownError
+/// );
+/// ```
+pub fn shell_expect_ok<T, E: fmt::Debug>(result: Result<T, E>, message: &str, error: ShellError) -> T {
+    if result.is_err() { shell_panic(message, error); }
+    return result.unwrap();
+}

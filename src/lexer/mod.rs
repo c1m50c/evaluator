@@ -144,6 +144,15 @@ impl Lexer {
         self.next_position = 1;
         self.current_char = self.characters[0];
     }
+
+    /// Reverses the positonal values back by one.
+    pub fn back(&mut self) {
+        if self.position >= 1 {
+            self.position -= 1;
+            self.next_position -= 1;
+            self.current_char = self.characters[self.position];
+        }
+    }
 }
 
 

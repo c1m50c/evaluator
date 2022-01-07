@@ -3,6 +3,7 @@ pub(crate) mod enums;
 
 use enums::*;
 use super::lexer::{token::Token, Lexer};
+use super::shell::print_debug;
 use super::shell::error::*;
 use std::vec::Vec;
 
@@ -12,6 +13,58 @@ pub type ParsedData = Vec<Statement>;
 
 pub struct Parser {
     lexer: Lexer,
+}
+
+
+impl Parser {
+    fn parse_expression(&mut self, binding_power: usize) -> Expression {
+        let mut left = match self.lexer.next() {
+            Some(Token::Word(x)) => {
+                Expression::String(x)
+            },
+
+            Some(Token::Number(x)) => {
+                let converted = shell_expect_ok(
+                    x.parse::<f64>(),
+                    format!("Cannot convert '{}' to a 64-bit floating point number.", x).as_ref(),
+                    ShellError::ParsingError
+                );
+
+                Expression::Float(converted)
+            },
+            
+            _ => shell_panic(
+                "Cannot evaluate expression.",
+                ShellError::ParsingError
+            ),
+        };
+
+        loop {
+            let operator = match self.lexer.peek() {
+                Some(t) => t,
+                None => break,
+            };
+
+            if let Some((left_binding_power, right_binding_power)) = get_binding_power(operator) {
+                if left_binding_power < binding_power { break; }
+
+                let next_operator = shell_expect_some(
+                    self.lexer.next(),
+                    "Cannot retrieve the next operator within the Parser's Lexer.",
+                    ShellError::ParsingError
+                );
+
+                let right = self.parse_expression(right_binding_power);
+                left = make_arithmetic_expression(Box::new(left), next_operator, Box::new(right));
+
+                continue;
+            }
+
+            break;
+        }
+        
+        return left;
+    }
 }
 
 
@@ -27,75 +80,17 @@ impl Parser {
         let mut result: ParsedData = ParsedData::new();
 
         while let Some(t) = self.lexer.next() {
+            print_debug("Parsing Token", format!("{}", t).as_ref());
+
             match t {
-                Token::Number(x) => {
-                    /* Arithmetic Statement */
-                    // TODO: Support for multiple operations in same statement.
-                    if let Ok(a) = x.parse::<f64>() {
-                        let operator: ArithmeticOperation;
-
-                        if let Some(o) = self.lexer.next() {
-                            match o {
-                                Token::Plus => operator = ArithmeticOperation::Addition,
-                                Token::Minus => operator = ArithmeticOperation::Subtraction,
-                                Token::Star => operator = ArithmeticOperation::Multiplication,
-                                Token::ForwardSlash => operator = ArithmeticOperation::Division,
-                                Token::Percent => operator = ArithmeticOperation::Modulo,
-                                Token::Caret => operator = ArithmeticOperation::Pow,
-
-                                _ => shell_panic(
-                                    format!("Token '{}' is not a valid operator.", o).as_ref(),
-                                    ShellError::SyntaxError
-                                ),
-                            }
-                        } else {
-                            shell_panic(
-                                "Cannot retrieve next token in statement.",
-                                ShellError::SyntaxError
-                            );
-                        }
-
-                        if let Some(b) = self.lexer.next() {
-                            match b {
-                                Token::Number(b) => {
-                                    if let Ok(b) = b.parse::<f64>() {
-                                        let expression = Expression::Arithmetic(
-                                            Box::new(Expression::Float(a)),
-                                            operator,
-                                            Box::new(Expression::Float(b))
-                                        );
-    
-                                        result.push(Statement::Arithmetic(expression));
-                                    } else {
-                                        shell_panic(
-                                            format!("Cannot convert '{}' to a 64-bit floating point number.", b).as_ref(),
-                                            ShellError::ParsingError
-                                        );
-                                    }
-                                }
-
-                                _ => shell_panic(
-                                    format!("Token '{}' is not a number.", b).as_ref(),
-                                    ShellError::SyntaxError
-                                ),
-                            }
-                        } else {
-                            shell_panic(
-                                "Cannot retrieve next token in statement.",
-                                ShellError::SyntaxError
-                            );
-                        }
-                    } else {
-                        shell_panic(
-                            format!("Cannot convert '{}' to a 64-bit floating point number.", x).as_ref(),
-                            ShellError::ParsingError
-                        );
-                    }
-                },
-
                 Token::Word(x) => {
-                    /* Command Statement */
                     result.push(Statement::Command(x));
+                },
+                
+                Token::Number(_) => {
+                    self.lexer.back(); // TODO: This is not properly reversing
+                    let expression = self.parse_expression(0);
+                    result.push(Statement::Arithmetic(expression));
                 },
 
                 _ => shell_panic(
@@ -106,6 +101,23 @@ impl Parser {
         }
 
         return result;
+    }
+}
+
+
+fn make_arithmetic_expression(left: Box<Expression>, operator: Token, right: Box<Expression>) -> Expression {
+    match operator {
+        Token::Plus => Expression::Arithmetic(left, ArithmeticOperation::Addition, right),
+        Token::Minus => Expression::Arithmetic(left, ArithmeticOperation::Subtraction, right),
+        Token::Star => Expression::Arithmetic(left, ArithmeticOperation::Multiplication, right),
+        Token::ForwardSlash => Expression::Arithmetic(left, ArithmeticOperation::Division, right),
+        Token::Percent => Expression::Arithmetic(left, ArithmeticOperation::Modulo, right),
+        Token::Caret => Expression::Arithmetic(left, ArithmeticOperation::Pow, right),
+
+        _ => shell_panic(
+            format!("Cannot create expression from '{}, {}, {}'.", left, operator, right).as_ref(),
+            ShellError::ParsingError
+        ),
     }
 }
 

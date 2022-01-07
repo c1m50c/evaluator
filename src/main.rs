@@ -3,11 +3,14 @@ mod lexer;
 mod shell;
 
 
+#[allow(unused_imports)]
 use term_painter::{ToStyle, Color::*};
+
 use shell::eval::evaluate_statements;
+use shell::{input, print_debug};
 use parser::Parser;
 use lexer::Lexer;
-use shell::input;
+
 use std::thread;
 
 
@@ -23,19 +26,11 @@ fn main() {
 
             if cfg!(debug_assertions) {
                 while let Some(t) = lexer.next() {
-                    println!("{} {}: {}",
-                        Green.bold().paint("[ DEBUG ]"),
-                        Cyan.paint("Lexical Token"),
-                        t
-                    );
+                    print_debug("Lexical Token", format!("{}", t).as_ref());
                 }
 
                 for s in parsed_data.clone() {
-                    println!("{} {}: {}",
-                        Green.bold().paint("[ DEBUG ]"),
-                        Cyan.paint("Parsing Statement"),
-                        s
-                    );
+                    print_debug("Parsing Statement", format!("{}", s).as_ref());
                 }
             }
 

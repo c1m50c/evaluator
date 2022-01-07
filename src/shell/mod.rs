@@ -22,3 +22,14 @@ pub fn input() -> String {
         .expect("Failed to read line from standard input.");
     return input.trim().to_string();
 }
+
+
+pub fn print_debug(title: &str, message: &str) {
+    if cfg!(debug_assertions) {
+        println!("{} {}: {}",
+            Green.bold().paint("[ DEBUG ]"),
+            Cyan.paint(title),
+            message
+        );
+    }
+}
