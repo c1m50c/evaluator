@@ -73,7 +73,7 @@ pub fn shell_expect_some<T>(option: Option<T>, message: &str, error: ShellError)
 /// let ok: Result<bool, ShellError> = Ok(true);
 /// let err: Result<bool, ShellError> = Err(ShellError::UnknownError);
 /// 
-/// let is_ok: bool = shell_expect_some(
+/// let is_ok: bool = shell_expect_ok(
 ///     ok,
 ///     "This will be equal to `true`.",
 ///     ShellError::UnknownError
@@ -81,7 +81,7 @@ pub fn shell_expect_some<T>(option: Option<T>, message: &str, error: ShellError)
 /// 
 /// assert_eq!(is_ok, true);
 /// 
-/// let this_will_panic: bool = shell_expect_some(
+/// let this_will_panic: bool = shell_expect_ok(
 ///     err,
 ///     "This will panic due to `err` being an Error.",
 ///     ShellError::UnkownError
