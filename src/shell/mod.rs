@@ -24,6 +24,15 @@ pub fn input() -> String {
 }
 
 
+/// Slightly tweaked version of the `println!` Macro but as a Function.
+/// If the build was built in `debug` mode this will print a formatted string to the standard output.
+/// 
+/// ## Example:
+/// ```rust
+/// let t = Token::Plus;
+/// print_debug("Lexical Analysis", format!("We got some Token '{}'.", t).as_ref());
+/// // "[ DEBUG ] Lexical Analysis: We got some Token 'Plus'." will be printed to the standard output.
+/// ```
 pub fn print_debug(title: &str, message: &str) {
     if cfg!(debug_assertions) {
         println!("{} {}: {}",
