@@ -1,3 +1,6 @@
+pub mod lexer;
+
+
 #[allow(unused_imports)]
 use term_painter::{ToStyle, Color::*};
 use std::thread;
