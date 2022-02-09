@@ -1,5 +1,6 @@
 pub mod token;
 
+use super::shell::{ShellError, shell_panic};
 use core::iter::Iterator;
 use std::vec::Vec;
 use token::Token;
@@ -116,7 +117,10 @@ impl Lexer {
                 }
 
                 if string.matches(".").count() > 1 {
-                    panic!("Too many decimals within a Number Token.");
+                    shell_panic(
+                        ShellError::SyntaxError,
+                        format!("Too many decimals within the Token::Number(\"{}\").", string)
+                    );
                 }
 
                 Token::Number(string)
@@ -135,7 +139,10 @@ impl Lexer {
                 Token::Word(string)
             },
 
-            c => panic!("Character '{}' is not a valid Token", c),
+            c => shell_panic(
+                ShellError::SyntaxError,
+                format!("Character '{}' is not in a valid Token pattern.", c)
+            ),
         };
 
         return Some(token);
