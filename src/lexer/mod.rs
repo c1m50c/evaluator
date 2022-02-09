@@ -7,6 +7,7 @@ use token::Token;
 
 
 /// Struct for performing lexical analysis on a [`String`].
+#[derive(Debug, Clone)]
 pub struct Lexer {
     /// [`char`]s of the passed [`String`] in the constructor.
     characters: Vec<char>,

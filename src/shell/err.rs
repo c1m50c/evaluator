@@ -6,8 +6,14 @@ use std::panic::set_hook;
 /// For representing certain errors in [`shell_panic`].
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ShellError {
+    /// Generic error thrown when you don't know which else to use.
+    UnknownError,
+    
     /// Normally represents a error ocurring during lexical analyisis.
     SyntaxError,
+
+    /// Errors that occur during parsing.
+    ParsingError,
 }
 
 
@@ -17,7 +23,7 @@ pub enum ShellError {
 pub fn shell_panic<E: Debug, S: Display>(error: E, msg: S) -> ! {
     println!("{}{}",
         Red.bold().paint(format!("{:?}: ", error)),
-        BrightWhite.paint(format!("{}", msg))
+        format!("{}", msg)
     );
     
     set_hook(Box::new(|_| {  }));

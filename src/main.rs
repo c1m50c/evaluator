@@ -1,3 +1,4 @@
+pub mod parser;
 pub mod lexer;
 pub mod shell;
 
@@ -13,12 +14,22 @@ fn main() {
 
         let execution_thread = thread::spawn(move || {
             let lexer = lexer::Lexer::new(inp);
+
+            let parser = parser::Parser::new(lexer.clone());
+            let parsed_data = parser.parse();
             
             if cfg!(debug_assertions) {
                 for token in lexer {
                     shell::debug_print(
-                        "Lexical Analyis",
+                        "Lexical Analysis",
                         format!("{:?}", token).as_str()
+                    );
+                }
+
+                for statement in parsed_data {
+                    shell::debug_print(
+                        "Parsing",
+                        format!("{:?}", statement).as_str()
                     );
                 }
             }
