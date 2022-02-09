@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 pub mod token;
 
 use super::shell::{ShellError, shell_panic};
@@ -21,7 +24,7 @@ impl Lexer {
     /// Skips all empty or whitespace [`char`]s.
     #[inline]
     fn skip_empty(&mut self) {
-        while self.characters[self.position].is_whitespace() {
+        while self.current().is_whitespace() {
             self.position += 1;
         }
     }
@@ -106,7 +109,16 @@ impl Lexer {
         
         self.skip_empty();
 
-        let token = match self.characters[self.position] {
+        let token = match self.current() {
+            '+' => Token::Plus,
+            '-' => Token::Minus,
+            '*' => Token::Star,
+            '/' => Token::ForwardSlash,
+            '=' => Token::Equal,
+            '<' => Token::Greater,
+            '>' => Token::Less,
+            '^' => Token::Caret,
+
             c if c.is_numeric() => {
                 let mut string = String::new();
                 string.push(c);
@@ -146,6 +158,7 @@ impl Lexer {
             ),
         };
 
+        self.position += 1;
         return Some(token);
     }
 }
