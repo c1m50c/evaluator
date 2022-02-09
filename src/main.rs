@@ -1,6 +1,7 @@
 pub mod parser;
 pub mod lexer;
 pub mod shell;
+pub mod eval;
 
 
 #[allow(unused_imports)]
@@ -26,13 +27,15 @@ fn main() {
                     );
                 }
 
-                for statement in parsed_data {
+                for statement in parsed_data.clone() {
                     shell::debug_print(
                         "Parsing",
                         format!("{:?}", statement).as_str()
                     );
                 }
             }
+
+            eval::evaluate(parsed_data);
         });
 
         let _ = execution_thread.join();

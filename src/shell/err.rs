@@ -12,8 +12,11 @@ pub enum ShellError {
     /// Normally represents a error ocurring during lexical analyisis.
     SyntaxError,
 
-    /// Errors that occur during parsing.
+    /// Error that occurs during parsing.
     ParsingError,
+
+    /// Error that occurs during evaluation.
+    EvaluationError,
 }
 
 
@@ -23,7 +26,7 @@ pub enum ShellError {
 pub fn shell_panic<E: Debug, S: Display>(error: E, msg: S) -> ! {
     println!("{}{}",
         Red.bold().paint(format!("{:?}: ", error)),
-        format!("{}", msg)
+        msg
     );
     
     set_hook(Box::new(|_| {  }));
