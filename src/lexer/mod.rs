@@ -105,6 +105,23 @@ impl Lexer {
         self.skip_empty();
 
         let token = match self.characters[self.position] {
+            c if c.is_numeric() => {
+                let mut string = String::new();
+                string.push(c);
+                self.position += 1;
+
+                while self.position < self.len() && (self.current().is_numeric() || self.current() == '.') {
+                    string.push(self.current());
+                    self.position += 1;
+                }
+
+                if string.matches(".").count() > 1 {
+                    panic!("Too many decimals within a Number Token.");
+                }
+
+                Token::Number(string)
+            },
+
             c if c.is_alphabetic() => {
                 let mut string = String::new();
                 string.push(c);
