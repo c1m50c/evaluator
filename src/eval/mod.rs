@@ -4,6 +4,8 @@ use core::result::Result;
 use std::process::exit;
 
 
+/// Evaluates and executes a command [`Statement`],
+/// returning a [`Result`] containing the error message if something were to go wrong.
 #[allow(unreachable_code)]
 fn evaluate_command(command: &str) -> Result<(), String> {
     match command {
@@ -18,29 +20,24 @@ fn evaluate_command(command: &str) -> Result<(), String> {
 }
 
 
-#[allow(unreachable_patterns)]
-fn evaluate_statement(statement: Statement) {
-    match statement {
-        Statement::Command(c) => {
-            if let Err(error_message) = evaluate_command(c.to_lowercase().as_str()) {
-                shell_panic(
-                    ShellError::EvaluationError,
-                    error_message
-                );
-            }
-        },
-    
-        s => shell_panic(
-            ShellError::EvaluationError,
-            format!("Statement::{:?} cannot be evaluated.", s)
-        ),
-    }
-}
-
-
 #[inline]
+#[allow(unreachable_patterns)]
 pub fn evaluate(statements: Vec<Statement>) {
     for s in statements {
-        evaluate_statement(s);
+        match s {
+            Statement::Command(c) => {
+                if let Err(error_message) = evaluate_command(c.to_lowercase().as_str()) {
+                    shell_panic(
+                        ShellError::EvaluationError,
+                        error_message
+                    );
+                }
+            },
+        
+            _ => shell_panic(
+                ShellError::EvaluationError,
+                format!("Statement::{:?} cannot be evaluated.", s)
+            ),
+        }
     }
 }

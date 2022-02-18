@@ -20,6 +20,18 @@ impl Parser {
                 Statement::Command(s)
             },
 
+            Token::Number(n) => {
+                // TODO: Allow for parsining of an Arithmetic Statement.
+                
+                let n = n.parse::<f64>()
+                    .unwrap_or_else(|_| shell_panic(
+                        ShellError::ParsingError,
+                        format!("Cannot parse Token::Number({:?}) into a floating-point number.", n)
+                    ));
+                
+                Statement::Number(n)
+            }
+
             t => shell_panic(
                 ShellError::ParsingError,
                 format!("Cannot parse Token::{:?}.", t),

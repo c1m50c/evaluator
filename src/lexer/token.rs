@@ -1,5 +1,5 @@
 /// [`Token`]s to be parsed after lexical analysis.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     /// [`Token`] containing a [`String`] of alphabetic characters.
     Word(String),

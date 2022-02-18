@@ -4,6 +4,7 @@ mod tests;
 pub mod token;
 
 use super::shell::{ShellError, shell_panic};
+use core::ops::{Index, IndexMut};
 use core::iter::Iterator;
 use std::vec::Vec;
 use token::Token;
@@ -62,7 +63,7 @@ impl Lexer {
         return self.characters.len();
     }
 
-    /// Returns the [`char`] at the index of the [`Lexer`]'s `position` in its `characters`.
+    /// Returns the [`char`] at the index of the [`Lexer`]'s `position`.
     /// 
     /// ## Example
     /// ```rust
@@ -71,7 +72,22 @@ impl Lexer {
     /// ```
     #[inline]
     pub fn current(&self) -> char {
-        return self.characters[self.position];
+        return self[self.position];
+    }
+
+    /// Returns the [`char`] at the index of the [`Lexer`]'s `position` plus one.
+    #[inline]
+    pub fn peek(&self) -> char {
+        return self[self.position + 1];
+    }
+
+    /// Returns the next next [`Token`] within the [`Lexer`] without incrementing the [`Lexer`]'s `position`.
+    #[inline]
+    pub fn peek_token(&self) -> Option<Token> {
+        // NOTE: A bit greedy considering we're cloning the entirety of the [`Lexer`], can be optimized later.
+        let mut l = self.clone();
+        let _ = l.get_token();
+        return l.get_token();
     }
 
     /// Resets the [`Lexer`]'s `position` to zero.
@@ -110,6 +126,7 @@ impl Lexer {
         self.skip_empty();
 
         let token = match self.current() {
+            /* Operators */
             '+' => Token::Plus,
             '-' => Token::Minus,
             '*' => Token::Star,
@@ -132,7 +149,7 @@ impl Lexer {
                 if string.matches(".").count() > 1 {
                     shell_panic(
                         ShellError::SyntaxError,
-                        format!("Too many decimals within the Token::Number(\"{}\").", string)
+                        format!("Too many decimals within the Token::Number({:?}).", string)
                     );
                 }
 
@@ -170,5 +187,23 @@ impl Iterator for Lexer {
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         return self.get_token();
+    }
+}
+
+
+impl Index<usize> for Lexer {
+    type Output = char;
+
+    #[inline]
+    fn index(&self, idx: usize) -> &Self::Output {
+        return &self.characters[idx];
+    }
+}
+
+
+impl IndexMut<usize> for Lexer {
+    #[inline]
+    fn index_mut(&mut self, idx: usize) -> &mut Self::Output {
+        return &mut self.characters[idx];
     }
 }
