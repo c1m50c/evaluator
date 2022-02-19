@@ -8,6 +8,8 @@ use std::vec::Vec;
 
 #[derive(Debug, Clone)]
 pub struct Parser {
+    statements: Vec<Statement>,
+    position: usize,
     lexer: Lexer,
 }
 
@@ -17,15 +19,28 @@ impl Parser {
     #[inline]
     pub const fn new(lexer: Lexer) -> Self {
         return Self {
+            statements: Vec::new(),
+            position: 0,
             lexer,
         };
+    }
+
+    #[inline]
+    pub fn previous_statement(&self) -> &Statement {
+        return &self.statements[self.position - 1];
+    }
+
+    #[inline]
+    pub fn pop_previous_statement(&mut self) -> Statement {
+        return self.statements.pop().unwrap_or_else(|| shell_panic(
+            ShellError::ParsingError,
+            "Cannot pop the previous Statement from the Parser."
+        ));
     }
 
     /// Parses the [`Token`]s of the [`Lexer`] into [`Statement`]s to be evaluated.
     #[inline]
     pub fn parse(&mut self) -> Vec<Statement> {
-        let mut data = Vec::new();
-        
         while let Some(t) = self.lexer.get_token() {
             let token = match t {
                 Token::Word(s) => {
@@ -50,7 +65,7 @@ impl Parser {
 
                             let b = self.lexer.get_token()
                                 .unwrap_or_else(|| shell_panic(
-                                    ShellError::ParsingError,
+                                    ShellError::SyntaxError,
                                     format!("Expected a number after Token::{:?}.", operator)
                                 ));
                             
@@ -77,7 +92,50 @@ impl Parser {
 
                         _ => Statement::Number(a),
                     }
-                }
+                },
+
+                Token::Plus |
+                Token::Minus |
+                Token::Star |
+                Token::ForwardSlash |
+                Token::Caret => {
+                    match self.previous_statement() {
+                        Statement::Arithmetic(_, _, _) => {
+                            let a = self.pop_previous_statement();
+                            let operator = t;
+
+                            let b = self.lexer.get_token()
+                                .unwrap_or_else(|| shell_panic(
+                                    ShellError::SyntaxError,
+                                    format!("Expected a number after Token::{:?}.", operator)
+                                ));
+                            
+                            if let Token::Number(b) = b {
+                                let b = b.parse::<f64>()
+                                    .unwrap_or_else(|_| shell_panic(
+                                        ShellError::ParsingError,
+                                        format!("Cannot parse Token::Number({:?}) into a floating-point number.", b)
+                                    ));
+                                
+                                let b = Statement::Number(b);
+
+                                Statement::Arithmetic(Box::new(a), operator, Box::new(b))
+                            }
+
+                            else {
+                                shell_panic(
+                                    ShellError::SyntaxError,
+                                    format!("Expected a number after Token::{:?}.", operator)
+                                );
+                            }
+                        },
+
+                        _ => shell_panic(
+                            ShellError::ParsingError,
+                            format!("No Arithmetic Statement prior to Token::{:?}.", t)
+                        ),
+                    }
+                },
     
                 t => shell_panic(
                     ShellError::ParsingError,
@@ -85,9 +143,10 @@ impl Parser {
                 ),
             };
 
-            data.push(token);
+            self.position += 1;
+            self.statements.push(token);
         }
 
-        return data;
+        return self.statements.clone();
     }
 }
