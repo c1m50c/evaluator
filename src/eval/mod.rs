@@ -24,6 +24,14 @@ fn evaluate_command(command: &str) -> Result<(), String> {
 
 fn evaluate_arithmetic(a: Statement, operator: Token, b: Statement) -> Result<f64, String> {
     let a = match a {
+        Statement::Arithmetic(a, operator, b) => {
+            evaluate_arithmetic(*a, operator, *b).unwrap_or_else(|err| {
+                shell_panic(
+                    ShellError::EvaluationError, err
+                )
+            })
+        },
+
         Statement::Number(n) => n,
 
         _ => return Err(
@@ -32,6 +40,14 @@ fn evaluate_arithmetic(a: Statement, operator: Token, b: Statement) -> Result<f6
     };
 
     let b = match b {
+        Statement::Arithmetic(a, operator, b) => {
+            evaluate_arithmetic(*a, operator, *b).unwrap_or_else(|err| {
+                shell_panic(
+                    ShellError::EvaluationError, err
+                )
+            })
+        },
+        
         Statement::Number(n) => n,
 
         _ => return Err(
@@ -72,13 +88,11 @@ pub fn evaluate(statements: Vec<Statement>) {
             Statement::Arithmetic(a, operator, b) => {
                 match evaluate_arithmetic(*a, operator, *b) {
                     Ok(n) => println!("{}{}",
-                        Yellow.bold().paint(">>> "),
-                        n
+                        Yellow.bold().paint(">>> "), n
                     ),
 
                     Err(e) => shell_panic(
-                        ShellError::EvaluationError,
-                        e
+                        ShellError::EvaluationError, e
                     ),
                 }
             },
