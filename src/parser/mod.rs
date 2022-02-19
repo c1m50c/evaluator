@@ -42,7 +42,21 @@ impl Parser {
         while let Some(t) = self.lexer.get_token() {
             let token = match t {
                 Token::Word(s) => {
-                    Statement::Command(s)
+                    if let Some(Token::Number(n)) = self.lexer.peek_token() {
+                        let _ = self.lexer.get_token(); // Increment Lexer
+
+                        let n = n.parse::<f64>()
+                            .unwrap_or_else(|_| shell_panic(
+                                ShellError::ParsingError,
+                                format!("Cannot parse Token::Number({:?}) into a floating-point number.", n)
+                            ));
+                        
+                        let n = Statement::Number(n);
+                        
+                        Statement::MathematicalFunction(s, Box::new(n))
+                    }
+
+                    else { Statement::Command(s) }
                 },
     
                 Token::Number(n) => {

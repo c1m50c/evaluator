@@ -7,6 +7,9 @@ pub enum Statement {
     /// An arithmetic statement, containing `Statement::(Arithmetic || Number)`, `Token::(Arithmetic Operator)` and a `Statement::(Arithmetic || Number)`.
     Arithmetic(Box<Statement>, Token, Box<Statement>),
     
+    /// Function that takes a number and computes an output, contains a [`String`] and a `Statement::Number`.
+    MathematicalFunction(String, Box<Statement>),
+
     /// A statement containing an alphabetic [`String`].
     Command(String),
 

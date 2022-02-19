@@ -1,5 +1,7 @@
+#[allow(unused_imports)]
 use term_painter::{ToStyle, Color::*};
-use super::shell::{ShellError, shell_panic};
+
+use super::shell::{ShellError, shell_panic, output};
 use super::parser::enums::Statement;
 use super::lexer::token::Token;
 use core::result::Result;
@@ -71,31 +73,55 @@ fn evaluate_arithmetic(a: Statement, operator: Token, b: Statement) -> Result<f6
 }
 
 
+#[allow(unreachable_code)]
+fn evaluate_mathematical_function(func: &str, number: f64) -> Result<(), String> {
+    match func {
+        "sqrt" => output(number.sqrt()),
+        "sin" => output(number.sin()),
+        "cos" => output(number.cos()),
+
+        f => return Err(
+            format!("Mathematical Function '{}' does not exist.", f)
+        ),
+    }
+
+    return Ok(());
+}
+
+
 #[inline]
 #[allow(unreachable_patterns)]
 pub fn evaluate(statements: Vec<Statement>) {
     for s in statements {
         match s {
             Statement::Command(c) => {
-                if let Err(error_message) = evaluate_command(c.to_lowercase().as_str()) {
+                if let Err(err) = evaluate_command(c.to_lowercase().as_str()) {
                     shell_panic(
                         ShellError::EvaluationError,
-                        error_message
+                        err
                     );
                 }
             },
 
             Statement::Arithmetic(a, operator, b) => {
                 match evaluate_arithmetic(*a, operator, *b) {
-                    Ok(n) => println!("{}{}",
-                        Yellow.bold().paint(">>> "), n
-                    ),
+                    Ok(n) => output(n),
 
-                    Err(e) => shell_panic(
-                        ShellError::EvaluationError, e
+                    Err(err) => shell_panic(
+                        ShellError::EvaluationError, err
                     ),
                 }
             },
+
+            Statement::MathematicalFunction(s, n) => {
+                if let Statement::Number(n) = *n {
+                    if let Err(err) = evaluate_mathematical_function(s.to_lowercase().as_str(), n) {
+                        shell_panic(
+                            ShellError::EvaluationError, err
+                        );
+                    }
+                }
+            }
         
             _ => shell_panic(
                 ShellError::EvaluationError,

@@ -27,6 +27,14 @@ pub fn input() -> String {
 }
 
 
+#[inline]
+pub fn output<T: core::fmt::Display>(out: T) {
+    println!("{}{}",
+        Yellow.bold().paint(">>> "), out
+    );
+}
+
+
 /// Prints the `category` and `info` with special debug formatting, does not ensure application is in debug mode.
 #[inline]
 pub fn debug_print(category: &str, info: &str) {
