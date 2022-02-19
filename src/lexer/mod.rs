@@ -75,19 +75,11 @@ impl Lexer {
         return self[self.position];
     }
 
-    /// Returns the [`char`] at the index of the [`Lexer`]'s `position` plus one.
-    #[inline]
-    pub fn peek(&self) -> char {
-        return self[self.position + 1];
-    }
-
-    /// Returns the next next [`Token`] within the [`Lexer`] without incrementing the [`Lexer`]'s `position`.
+    /// Returns the next [`Token`] within the [`Lexer`] without incrementing the [`Lexer`]'s `position`.
+    // NOTE: A bit greedy considering we're cloning the entirety of the [`Lexer`], can be optimized later.
     #[inline]
     pub fn peek_token(&self) -> Option<Token> {
-        // NOTE: A bit greedy considering we're cloning the entirety of the [`Lexer`], can be optimized later.
-        let mut l = self.clone();
-        let _ = l.get_token();
-        return l.get_token();
+        return self.clone().get_token();
     }
 
     /// Resets the [`Lexer`]'s `position` to zero.

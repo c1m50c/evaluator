@@ -7,6 +7,9 @@ pub enum Token {
     /// [`Token`] containing a [`String`] that can be parsed into an integer or a floating-point number.
     Number(String),
 
+    /// An empty [`Token`] used for defaults in unwrapping mainly.
+    Empty,
+
     /// `+` Operator.
     Plus,
 

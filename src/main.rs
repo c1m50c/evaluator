@@ -16,7 +16,7 @@ fn main() {
         let execution_thread = thread::spawn(move || {
             let lexer = lexer::Lexer::new(inp);
 
-            let parser = parser::Parser::new(lexer.clone());
+            let mut parser = parser::Parser::new(lexer.clone());
             let parsed_data = parser.parse();
             
             if cfg!(debug_assertions) {
