@@ -9,7 +9,6 @@ use std::vec::Vec;
 #[derive(Debug, Clone)]
 pub struct Parser {
     statements: Vec<Statement>,
-    position: usize,
     lexer: Lexer,
 }
 
@@ -20,14 +19,13 @@ impl Parser {
     pub const fn new(lexer: Lexer) -> Self {
         return Self {
             statements: Vec::new(),
-            position: 0,
             lexer,
         };
     }
 
     #[inline]
     pub fn previous_statement(&self) -> &Statement {
-        return &self.statements[self.position - 1];
+        return &self.statements[self.statements.len() - 1];
     }
 
     #[inline]
@@ -143,7 +141,6 @@ impl Parser {
                 ),
             };
 
-            self.position += 1;
             self.statements.push(token);
         }
 
