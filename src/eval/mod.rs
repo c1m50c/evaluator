@@ -1,5 +1,7 @@
+use term_painter::{ToStyle, Color::*};
 use super::shell::{ShellError, shell_panic};
 use super::parser::enums::Statement;
+use super::lexer::token::Token;
 use core::result::Result;
 use std::process::exit;
 
@@ -20,6 +22,39 @@ fn evaluate_command(command: &str) -> Result<(), String> {
 }
 
 
+fn evaluate_arithmetic(a: Statement, operator: Token, b: Statement) -> Result<f64, String> {
+    let a = match a {
+        Statement::Number(n) => n,
+
+        _ => return Err(
+            format!("Cannot evaluate Statement::{:?} into a floating-point number.", a)
+        ),
+    };
+
+    let b = match b {
+        Statement::Number(n) => n,
+
+        _ => return Err(
+            format!("Cannot evaluate Statement::{:?} into a floating-point number.", b)
+        ),
+    };
+
+    let result = match operator {
+        Token::Plus => a + b,
+        Token::Minus => a - b,
+        Token::Star => a * b,
+        Token::ForwardSlash => a / b,
+        Token::Caret => a.powf(b),
+
+        _ => return Err(
+            format!("Token::{:?} is not a valid Arithmetic Operator.", operator)
+        ),
+    };
+    
+    return Ok(result);
+}
+
+
 #[inline]
 #[allow(unreachable_patterns)]
 pub fn evaluate(statements: Vec<Statement>) {
@@ -31,6 +66,20 @@ pub fn evaluate(statements: Vec<Statement>) {
                         ShellError::EvaluationError,
                         error_message
                     );
+                }
+            },
+
+            Statement::Arithmetic(a, operator, b) => {
+                match evaluate_arithmetic(*a, operator, *b) {
+                    Ok(n) => println!("{}{}",
+                        Yellow.bold().paint(">>> "),
+                        n
+                    ),
+
+                    Err(e) => shell_panic(
+                        ShellError::EvaluationError,
+                        e
+                    ),
                 }
             },
         
