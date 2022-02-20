@@ -26,7 +26,7 @@ impl Lexer {
     #[inline]
     fn skip_empty(&mut self) {
         while self.current().is_whitespace() {
-            self.position += 1;
+            self.skip_char();
         }
     }
 }
@@ -97,6 +97,18 @@ impl Lexer {
     #[inline]
     pub fn reset(&mut self) {
         self.position = 0;
+    }
+
+    /// Skips the current [`char`] in the [`Lexer`].
+    #[inline]
+    pub fn skip_char(&mut self) {
+        self.position += 1;
+    }
+
+    /// Skips the current [`Token`] in the [`Lexer`].
+    #[inline]
+    pub fn skip_token(&mut self) {
+        let _ = self.get_token();
     }
 
     /// Returns the next [`Token`] within the [`Lexer`], equivalent to the `next()` method.

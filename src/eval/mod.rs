@@ -78,7 +78,14 @@ fn evaluate_mathematical_function(func: &str, number: f64) -> Result<(), String>
     match func {
         "sqrt" => output(number.sqrt()),
         "sin" => output(number.sin()),
+        "asin" => output(number.asin()),
         "cos" => output(number.cos()),
+        "acos" => output(number.acos()),
+        "tan" => output(number.tan()),
+        "atan" => output(number.atan()),
+        "floor" => output(number.floor()),
+        "ceil" => output(number.ceil()),
+        "round" => output(number.round()),
 
         f => return Err(
             format!("Mathematical Function '{}' does not exist.", f)

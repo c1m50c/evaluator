@@ -43,7 +43,7 @@ impl Parser {
             let token = match t {
                 Token::Word(s) => {
                     if let Some(Token::Number(n)) = self.lexer.peek_token() {
-                        let _ = self.lexer.get_token(); // Increment Lexer
+                        self.lexer.skip_token();
 
                         let n = n.parse::<f64>()
                             .unwrap_or_else(|_| shell_panic(
