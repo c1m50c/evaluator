@@ -26,8 +26,29 @@ impl Lexer {
     #[inline]
     fn skip_empty(&mut self) {
         while self.current().is_whitespace() {
-            self.skip_char();
+            self.position += 1;
         }
+    }
+
+    /// Attempts to create a `Number` [`Token`] from the current `position` of the [`Lexer`], shell panicing if an error occurs.
+    fn create_number(&mut self) -> Token {
+        let mut string = String::new();
+        string.push(self.current());
+        self.position += 1;
+
+        while self.position < self.len() && (self.current().is_numeric() || self.current() == '.') {
+            string.push(self.current());
+            self.position += 1;
+        }
+
+        if string.matches(".").count() > 1 {
+            shell_panic(
+                ShellError::SyntaxError,
+                format!("Too many decimals within the Token::Number({:?}).", string)
+            );
+        }
+
+        return Token::Number(string);
     }
 }
 
@@ -99,12 +120,6 @@ impl Lexer {
         self.position = 0;
     }
 
-    /// Skips the current [`char`] in the [`Lexer`].
-    #[inline]
-    pub fn skip_char(&mut self) {
-        self.position += 1;
-    }
-
     /// Skips the current [`Token`] in the [`Lexer`].
     #[inline]
     pub fn skip_token(&mut self) {
@@ -132,7 +147,22 @@ impl Lexer {
         let token = match self.current() {
             /* Operators */
             '+' => Token::Plus,
-            '-' => Token::Minus,
+
+            '-' => {
+                self.position += 1; // Increment so `peek_token` works properly for this use case.
+
+                if let Some(Token::Number(_)) = self.peek_token() {
+                    // Create Negative Number
+                    self.position -= 1;
+                    self.create_number()
+                }
+
+                else {
+                    self.position -= 1;
+                    Token::Minus
+                }
+            },
+            
             '*' => Token::Star,
             '/' => Token::ForwardSlash,
             '=' => Token::Equal,
@@ -140,25 +170,7 @@ impl Lexer {
             '>' => Token::Less,
             '^' => Token::Caret,
 
-            c if c.is_numeric() => {
-                let mut string = String::new();
-                string.push(c);
-                self.position += 1;
-
-                while self.position < self.len() && (self.current().is_numeric() || self.current() == '.') {
-                    string.push(self.current());
-                    self.position += 1;
-                }
-
-                if string.matches(".").count() > 1 {
-                    shell_panic(
-                        ShellError::SyntaxError,
-                        format!("Too many decimals within the Token::Number({:?}).", string)
-                    );
-                }
-
-                Token::Number(string)
-            },
+            c if c.is_numeric() => self.create_number(),
 
             c if c.is_alphabetic() => {
                 let mut string = String::new();
