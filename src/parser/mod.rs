@@ -14,6 +14,18 @@ pub struct Parser {
 
 
 impl Parser {
+    /// Creates a `Number` [`Statement`] out of a [`String`] from a `Number` [`Token`].
+    #[inline]
+    fn create_number_statement(number: String) -> Result<Statement, String> {
+        return match number.parse::<f64>() {
+            Ok(n) => Ok(Statement::Number(n)),
+            Err(_) => Err(format!("Cannot parse Token::Number({:?}) into a floating-point number.", number)),
+        }
+    }
+}
+
+
+impl Parser {
     /// Constructs a new [`Parser`] with a [`Lexer`].
     #[inline]
     pub const fn new(lexer: Lexer) -> Self {
@@ -45,13 +57,10 @@ impl Parser {
                     if let Some(Token::Number(n)) = self.lexer.peek_token() {
                         self.lexer.skip_token();
 
-                        let n = n.parse::<f64>()
-                            .unwrap_or_else(|_| shell_panic(
-                                ShellError::ParsingError,
-                                format!("Cannot parse Token::Number({:?}) into a floating-point number.", n)
+                        let n = Self::create_number_statement(n)
+                            .unwrap_or_else(|err| shell_panic(
+                                ShellError::ParsingError, err
                             ));
-                        
-                        let n = Statement::Number(n);
                         
                         Statement::MathematicalFunction(s, Box::new(n))
                     }
@@ -60,10 +69,9 @@ impl Parser {
                 },
     
                 Token::Number(n) => {
-                    let a = n.parse::<f64>()
-                        .unwrap_or_else(|_| shell_panic(
-                            ShellError::ParsingError,
-                            format!("Cannot parse Token::Number({:?}) into a floating-point number.", n)
+                    let a = Self::create_number_statement(n)
+                        .unwrap_or_else(|err| shell_panic(
+                            ShellError::ParsingError, err
                         ));
                     
                     /* Parse into an Arithmetic Statement if possible. */
@@ -82,14 +90,10 @@ impl Parser {
                                 ));
                             
                             if let Token::Number(b) = b {
-                                let b = b.parse::<f64>()
-                                    .unwrap_or_else(|_| shell_panic(
-                                        ShellError::ParsingError,
-                                        format!("Cannot parse Token::Number({:?}) into a floating-point number.", b)
+                                let b = Self::create_number_statement(b)
+                                    .unwrap_or_else(|err| shell_panic(
+                                        ShellError::ParsingError, err
                                     ));
-
-                                let a = Statement::Number(a);
-                                let b = Statement::Number(b);
 
                                 Statement::Arithmetic(Box::new(a), operator, Box::new(b))
                             }
@@ -102,7 +106,7 @@ impl Parser {
                             }
                         },
 
-                        _ => Statement::Number(a),
+                        _ => a,
                     }
                 },
 
@@ -123,14 +127,11 @@ impl Parser {
                                 ));
                             
                             if let Token::Number(b) = b {
-                                let b = b.parse::<f64>()
-                                    .unwrap_or_else(|_| shell_panic(
-                                        ShellError::ParsingError,
-                                        format!("Cannot parse Token::Number({:?}) into a floating-point number.", b)
+                                let b = Self::create_number_statement(b)
+                                    .unwrap_or_else(|err| shell_panic(
+                                        ShellError::ParsingError, err
                                     ));
                                 
-                                let b = Statement::Number(b);
-
                                 Statement::Arithmetic(Box::new(a), operator, Box::new(b))
                             }
 
