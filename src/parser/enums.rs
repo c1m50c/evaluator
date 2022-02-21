@@ -1,18 +1,6 @@
-use super::super::lexer::token::Token;
-use std::boxed::Box;
-
-
-#[derive(Debug, PartialEq, Clone)]
+/// [`Statement`]s to evaluated after being parsed.
 pub enum Statement {
-    /// An arithmetic statement, containing `Statement::(Arithmetic || Number)`, `Token::(Arithmetic Operator)` and a `Statement::(Arithmetic || Number)`.
-    Arithmetic(Box<Statement>, Token, Box<Statement>),
-    
-    /// Function that takes a number and computes an output, contains a [`String`] and a `Statement::Number`.
-    MathematicalFunction(String, Box<Statement>),
-
-    /// A statement containing an alphabetic [`String`].
+    /// `Command` [`Statement`] describing a `Command` that can be executed during evaluation,
+    /// the [`String`] contains lowercase alphabetic characters.
     Command(String),
-
-    /// A statement containing a [`f64`] number.
-    Number(f64),
 }

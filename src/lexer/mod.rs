@@ -30,7 +30,7 @@ impl Lexer {
         }
     }
 
-    /// Attempts to create a `Number` [`Token`] from the current `position` of the [`Lexer`], shell panicing if an error occurs.
+    /// Attempts to create a `Number` [`Token`] from the current `position` of the [`Lexer`], shell panicking if an error occurs.
     fn create_number(&mut self) -> Token {
         let mut string = String::new();
         string.push(self.current());
@@ -145,7 +145,6 @@ impl Lexer {
         self.skip_empty();
 
         let token = match self.current() {
-            /* Operators */
             '+' => Token::Plus,
 
             '-' => {

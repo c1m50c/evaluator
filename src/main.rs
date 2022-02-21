@@ -11,13 +11,12 @@ use std::thread;
 
 fn main() {
     loop {
-        let inp = shell::input();
+        let input = shell::input();
 
         let execution_thread = thread::spawn(move || {
-            let lexer = lexer::Lexer::new(inp);
+            let lexer = lexer::Lexer::new(input);
 
             let mut parser = parser::Parser::new(lexer.clone());
-            let parsed_data = parser.parse();
             
             if cfg!(debug_assertions) {
                 for token in lexer {
@@ -27,15 +26,13 @@ fn main() {
                     );
                 }
 
-                for statement in parsed_data.clone() {
-                    shell::debug_print(
-                        "Parsing",
-                        format!("{:?}", statement).as_str()
-                    );
-                }
+                // for statement in parsed_data.clone() {
+                //     shell::debug_print(
+                //         "Parsing",
+                //         format!("{:?}", statement).as_str()
+                //     );
+                // }
             }
-
-            eval::evaluate(parsed_data);
         });
 
         let _ = execution_thread.join();

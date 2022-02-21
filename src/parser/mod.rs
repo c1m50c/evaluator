@@ -1,32 +1,23 @@
 pub mod enums;
 
-use enums::*;
 use super::shell::{ShellError, shell_panic};
-use super::lexer::{Lexer, token::Token};
+use super::lexer::{token::Token, Lexer};
 use std::vec::Vec;
+use enums::*;
 
 
-#[derive(Debug, Clone)]
+/// Creates [`Statement`]s that describe operations and expressions for evaluation.
 pub struct Parser {
+    /// [`Vec`] of [`Statement`]s to be constructed after the `parse()` method is called.
     statements: Vec<Statement>,
+    
+    /// [`Lexer`] of the [`Parser`], used in constructing the [`Statement`]s of the [`Parser`].
     lexer: Lexer,
 }
 
 
 impl Parser {
-    /// Creates a `Number` [`Statement`] out of a [`String`] from a `Number` [`Token`].
-    #[inline]
-    fn create_number_statement(number: String) -> Result<Statement, String> {
-        return match number.parse::<f64>() {
-            Ok(n) => Ok(Statement::Number(n)),
-            Err(_) => Err(format!("Cannot parse Token::Number({:?}) into a floating-point number.", number)),
-        }
-    }
-}
-
-
-impl Parser {
-    /// Constructs a new [`Parser`] with a [`Lexer`].
+    /// Constructs a new [`Parser`] out of a [`Lexer`].
     #[inline]
     pub const fn new(lexer: Lexer) -> Self {
         return Self {
@@ -35,130 +26,22 @@ impl Parser {
         };
     }
 
-    #[inline]
-    pub fn previous_statement(&self) -> &Statement {
-        return &self.statements[self.statements.len() - 1];
-    }
 
-    #[inline]
-    pub fn pop_previous_statement(&mut self) -> Statement {
-        return self.statements.pop().unwrap_or_else(|| shell_panic(
-            ShellError::ParsingError,
-            "Cannot pop the previous Statement from the Parser."
-        ));
-    }
-
-    /// Parses the [`Token`]s of the [`Lexer`] into [`Statement`]s to be evaluated.
-    #[inline]
-    pub fn parse(&mut self) -> Vec<Statement> {
-        while let Some(t) = self.lexer.get_token() {
-            let token = match t {
-                Token::Word(s) => {
-                    if let Some(Token::Number(n)) = self.lexer.peek_token() {
-                        self.lexer.skip_token();
-
-                        let n = Self::create_number_statement(n)
-                            .unwrap_or_else(|err| shell_panic(
-                                ShellError::ParsingError, err
-                            ));
-                        
-                        Statement::MathematicalFunction(s, Box::new(n))
-                    }
-
-                    else { Statement::Command(s) }
+    /// Parses the [`Token`]s within the [`Lexer`] into [`Statement`]s.
+    pub fn parse(&mut self) {
+        while let Some(current_token) = self.lexer.next() {
+            let s = match current_token {
+                Token::Word(word) => {
+                    Statement::Command(word.to_lowercase())
                 },
-    
-                Token::Number(n) => {
-                    let a = Self::create_number_statement(n)
-                        .unwrap_or_else(|err| shell_panic(
-                            ShellError::ParsingError, err
-                        ));
-                    
-                    /* Parse into an Arithmetic Statement if possible. */
-                    match self.lexer.peek_token().unwrap_or(Token::Empty) {
-                        Token::Plus |
-                        Token::Minus |
-                        Token::Star |
-                        Token::ForwardSlash |
-                        Token::Caret => {
-                            let operator = self.lexer.get_token().unwrap();
-
-                            let b = self.lexer.get_token()
-                                .unwrap_or_else(|| shell_panic(
-                                    ShellError::SyntaxError,
-                                    format!("Expected a number after Token::{:?}.", operator)
-                                ));
-                            
-                            if let Token::Number(b) = b {
-                                let b = Self::create_number_statement(b)
-                                    .unwrap_or_else(|err| shell_panic(
-                                        ShellError::ParsingError, err
-                                    ));
-
-                                Statement::Arithmetic(Box::new(a), operator, Box::new(b))
-                            }
-                            
-                            else {
-                                shell_panic(
-                                    ShellError::SyntaxError,
-                                    format!("Expected a number after Token::{:?}.", operator)
-                                );
-                            }
-                        },
-
-                        _ => a,
-                    }
-                },
-
-                Token::Plus |
-                Token::Minus |
-                Token::Star |
-                Token::ForwardSlash |
-                Token::Caret => {
-                    match self.previous_statement() {
-                        Statement::Arithmetic(_, _, _) => {
-                            let a = self.pop_previous_statement();
-                            let operator = t;
-
-                            let b = self.lexer.get_token()
-                                .unwrap_or_else(|| shell_panic(
-                                    ShellError::SyntaxError,
-                                    format!("Expected a number after Token::{:?}.", operator)
-                                ));
-                            
-                            if let Token::Number(b) = b {
-                                let b = Self::create_number_statement(b)
-                                    .unwrap_or_else(|err| shell_panic(
-                                        ShellError::ParsingError, err
-                                    ));
-                                
-                                Statement::Arithmetic(Box::new(a), operator, Box::new(b))
-                            }
-
-                            else {
-                                shell_panic(
-                                    ShellError::SyntaxError,
-                                    format!("Expected a number after Token::{:?}.", operator)
-                                );
-                            }
-                        },
-
-                        _ => shell_panic(
-                            ShellError::ParsingError,
-                            format!("No Arithmetic Statement prior to Token::{:?}.", t)
-                        ),
-                    }
-                },
-    
+                
                 t => shell_panic(
                     ShellError::ParsingError,
-                    format!("Cannot parse Token::{:?}.", t),
+                    format!("Cannot parse Token::{:?} into a Statement.", t)
                 ),
             };
 
-            self.statements.push(token);
+            self.statements.push(s);
         }
-
-        return self.statements.clone();
     }
 }
