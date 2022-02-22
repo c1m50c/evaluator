@@ -27,6 +27,13 @@ impl Parser {
     }
 
 
+    /// Returns the `statements` field of the [`Parser`].
+    #[inline]
+    pub fn get_statements(&self) -> Vec<Statement> {
+        return self.statements.clone();
+    }
+
+
     /// Parses the [`Token`]s within the [`Lexer`] into [`Statement`]s.
     pub fn parse(&mut self) {
         while let Some(current_token) = self.lexer.next() {
