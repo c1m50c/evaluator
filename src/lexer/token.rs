@@ -34,3 +34,37 @@ pub enum Token {
     /// `^` Operator.
     Caret,
 }
+
+
+impl Token {
+    /// Checks the [`Token`] determining if it is a valid operator.
+    #[inline]
+    pub fn is_operator(self) -> bool {
+        match self {
+            Token::Plus |
+            Token::Minus |
+            Token::Star |
+            Token::ForwardSlash |
+            Token::Caret |
+            Token::Equal |
+            Token::Greater |
+            Token::Less => true,
+            
+            _ => false,
+        }
+    }
+
+    /// Checks the [`Token`] determining if it is a valid arithmetic operator.
+    #[inline]
+    pub fn is_arithmetic_operator(self) -> bool {
+        match self {
+            Token::Plus |
+            Token::Minus |
+            Token::Star |
+            Token::ForwardSlash |
+            Token::Caret => true,
+            
+            _ => false,
+        }
+    }
+}
