@@ -3,8 +3,12 @@ use super::parser::enums::Statement;
 use std::process::exit;
 
 
+/// Struct for evaluating and executing [`Statement`]s from a [`Parser`].
 pub struct Evaluator {
+    /// Contains [`Statement`]s usually obtained from a [`Parser`], to be looked through and evaluated.
     statements: Vec<Statement>,
+
+    /// Current `index` within the `statements` field.
     position: usize,
 }
 

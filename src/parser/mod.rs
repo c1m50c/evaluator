@@ -38,6 +38,16 @@ impl Parser {
     pub fn parse(&mut self) {
         while let Some(current_token) = self.lexer.next() {
             let s = match current_token {
+                Token::Number(number) => {
+                    let number = number.parse::<f64>()
+                        .unwrap_or_else(|_| shell_panic(
+                            ShellError::ParsingError,
+                            format!("Cannot parse Token::Number({:?}) into a floating-point number.", number)
+                        ));
+                    
+                    Statement::Number(number)
+                }
+                
                 Token::Word(word) => {
                     Statement::Command(word.to_lowercase())
                 },

@@ -15,10 +15,10 @@ fn main() {
 
         let execution_thread = thread::spawn(move || {
             // NOTE: The inner-code of this scope can be and should be cleaned up.
-            
+
             let lexer = lexer::Lexer::new(input);
 
-            let mut parser = parser::Parser::new(lexer.clone());
+            let mut parser = parser::Parser::new(lexer.clone()); 
             parser.parse();
 
             let statements = parser.get_statements();
