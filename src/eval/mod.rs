@@ -35,7 +35,6 @@ impl Evaluator {
     }
     
     /// Attemps to evaluate an `Arithmetic` [`Statement`] into a [`f64`] number.
-    // TODO: Cleanup this Code.
     #[allow(unreachable_patterns)]
     fn evaluate_arithmetic(a: Statement, o: BinaryOperation, b: Statement) -> Result<f64, String> {
         let a = Self::match_arithmetic_statement(a);
