@@ -14,38 +14,36 @@ pub struct Evaluator {
 
 
 impl Evaluator {
+    /// Attempts to matches an `Arithmetic` or `Number` [`Statement`] into a [`f64`], helper function for [`evaluate_arithmetic`].
+    // TODO: Maybe make this an inner function for `evaluate_arithmetic`.
+    #[inline]
+    fn match_arithmetic_statement(statement: Statement) -> Result<f64, String> {
+        return match statement {
+            Statement::Arithmetic(a, o, b) => {
+                let eval = Self::evaluate_arithmetic(*a, o, *b);
+    
+                if let Err(err) = eval { Err(err) }
+                else { Ok(eval.unwrap()) }
+            },
+    
+            Statement::Number(n) => Ok(n),
+    
+            s => return Err(
+                format!("Statement::{:?} is not a Number or Arithmetic Statement.", s)
+            )
+        };
+    }
+    
+    /// Attemps to evaluate an `Arithmetic` [`Statement`] into a [`f64`] number.
     // TODO: Cleanup this Code.
     #[allow(unreachable_patterns)]
     fn evaluate_arithmetic(a: Statement, o: BinaryOperation, b: Statement) -> Result<f64, String> {
-        let a = match a {
-            Statement::Arithmetic(a, o, b) => {
-                let eval = Self::evaluate_arithmetic(*a, o, *b);
+        let a = Self::match_arithmetic_statement(a);
+        let b = Self::match_arithmetic_statement(b);
 
-                if let Err(err) = eval { return Err(err); }
-                else { eval.unwrap() }
-            },
-
-            Statement::Number(n) => n,
-
-            s => return Err(
-                format!("Statement::{:?} is not a Number or Arithmetic Statement.", s)
-            )
-        };
-
-        let b = match b {
-            Statement::Arithmetic(a, o, b) => {
-                let eval = Self::evaluate_arithmetic(*a, o, *b);
-
-                if let Err(err) = eval { return Err(err); }
-                else { eval.unwrap() }
-            },
-
-            Statement::Number(n) => n,
-
-            s => return Err(
-                format!("Statement::{:?} is not a Number or Arithmetic Statement.", s)
-            )
-        };
+        if let Err(err) = a { return Err(err); }
+        if let Err(err) = b { return Err(err); }
+        let a = a.unwrap(); let b = b.unwrap();
 
         return match o {
             BinaryOperation::Addition => Ok(a + b),
