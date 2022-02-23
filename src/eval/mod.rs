@@ -1,5 +1,5 @@
-use super::shell::{ShellError, shell_panic};
-use super::parser::enums::Statement;
+use super::parser::enums::{Statement, BinaryOperation};
+use super::shell::{ShellError, shell_panic, output};
 use std::process::exit;
 
 
@@ -14,6 +14,52 @@ pub struct Evaluator {
 
 
 impl Evaluator {
+    // TODO: Cleanup this Code.
+    #[allow(unreachable_patterns)]
+    fn evaluate_arithmetic(a: Statement, o: BinaryOperation, b: Statement) -> Result<f64, String> {
+        let a = match a {
+            Statement::Arithmetic(a, o, b) => {
+                let eval = Self::evaluate_arithmetic(*a, o, *b);
+
+                if let Err(err) = eval { return Err(err); }
+                else { eval.unwrap() }
+            },
+
+            Statement::Number(n) => n,
+
+            s => return Err(
+                format!("Statement::{:?} is not a Number or Arithmetic Statement.", s)
+            )
+        };
+
+        let b = match b {
+            Statement::Arithmetic(a, o, b) => {
+                let eval = Self::evaluate_arithmetic(*a, o, *b);
+
+                if let Err(err) = eval { return Err(err); }
+                else { eval.unwrap() }
+            },
+
+            Statement::Number(n) => n,
+
+            s => return Err(
+                format!("Statement::{:?} is not a Number or Arithmetic Statement.", s)
+            )
+        };
+
+        return match o {
+            BinaryOperation::Addition => Ok(a + b),
+            BinaryOperation::Subtraction => Ok(a - b),
+            BinaryOperation::Multiplication => Ok(a * b),
+            BinaryOperation::Division => Ok(a / b),
+            BinaryOperation::Power => Ok(a.powf(b)),
+
+            o => Err(
+                format!("BinaryOperation::{:?} is non-arithmetic.", o)
+            ),
+        };
+    }
+
     /// Evaluates the [`String`] from a `Command` [`Statement`].
     #[allow(unreachable_code)]
     fn evaluate_command(&self, cmd: String) -> Result<(), String> {
@@ -52,6 +98,15 @@ impl Evaluator {
     pub fn evaluate(&mut self) {
         while let Some(statement) = self.current() {
             match statement.clone() {
+                Statement::Arithmetic(a, o, b) => {
+                    match Self::evaluate_arithmetic(*a, o, *b) {
+                        Ok(n) => output(n),
+                        Err(err) => shell_panic(
+                            ShellError::EvaluationError, err
+                        ),
+                    }
+                },
+
                 Statement::Command(cmd) => {
                     if let Err(err) = self.evaluate_command(cmd.to_lowercase()) {
                         shell_panic(
