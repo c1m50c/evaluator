@@ -1,8 +1,11 @@
 # **evaluator**
 
-[![Build](https://github.com/c1m50c/evaluator/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/c1m50c/evaluator/actions/workflows/build.yml)
+![Build Status](https://img.shields.io/github/workflow/status/c1m50c/evaluator/Build?style=for-the-badge)
+![Lines of Code](https://img.shields.io/tokei/lines/github/c1m50c/evaluator?style=for-the-badge)
+![GitHub License](https://img.shields.io/github/license/c1m50c/evaluator?color=blue&style=for-the-badge)
 
-A shell based evaluator just made for personal use. Can parse and execute mathematical statements as well as various commands.
+
+Shell based application that performs lexical analysis, parsing, and evaluation to determine an output.
 
 
 ## **Running & Building**
@@ -13,7 +16,9 @@ You can run the application with `cargo` by running `cargo run`, you can add the
 ```bash
 $ cd evaluator
 $ cargo run
-...
+
+evaluator:$ 5 + 3
+>>> 8
 ```
 </details>
 
@@ -26,7 +31,9 @@ $ cd evaluator
 $ cargo build --release
 ...
 $ ./target/release/evaluator # An example of running the application.
-...
+
+evaluator:$ 72 + 4 + -4
+>>> 72
 ```
 </details>
 
