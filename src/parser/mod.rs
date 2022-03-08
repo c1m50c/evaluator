@@ -67,11 +67,11 @@ impl Parser {
                     let a = Self::parse_number(number);
 
                     match self.lexer.peek_token().unwrap_or(Token::Empty) {
-                        // FIXME: Should be able to bind `_` to a variable to avoid this, apparently can't?
-                        // This arm attempts to create an Arithmetic Statement if possible.
-                        _ if self.lexer.peek_token().unwrap().is_arithmetic_operator() => {
-                            let operator = self.lexer.get_token().unwrap();
+                        // Attempts to create an Arithmetic Statement.
+                        t if t.clone().is_arithmetic_operator() => {
+                            let operator = self.lexer.next().unwrap();
 
+                            // Attempt to retrieve a Token after the operator.
                             let b = self.lexer.get_token()
                                 .unwrap_or_else(|| shell_panic(
                                     ShellError::SyntaxError,
@@ -79,6 +79,7 @@ impl Parser {
                                 ));
                             
                             if let Token::Number(b) = b {
+                                // Attempts to verify the operator as a valid BinaryOperation.
                                 let operator = operator.clone().try_into()
                                     .unwrap_or_else(|err| shell_panic(
                                         err,
@@ -86,7 +87,6 @@ impl Parser {
                                     ));
                                 
                                 let b = Self::parse_number(b);
-
                                 Statement::Arithmetic(Box::new(a), operator, Box::new(b))
                             }
 
@@ -97,17 +97,15 @@ impl Parser {
                                 )
                             }
                         },
-
+                        
                         _ => a,
                     }
-                    
                 }
                 
                 Token::Word(word) => {
                     Statement::Command(word.to_lowercase())
                 },
 
-                // TODO: Cleanup using the `Clone` method if applicable.
                 t if t.clone().is_arithmetic_operator() => {
                     let maybe_arithmetic = self.pop_statement();
 
@@ -118,7 +116,7 @@ impl Parser {
                                 format!("Cannot convert Token::{:?} into a BinaryOperation", t)
                             ));
                         
-                        if let Some(Token::Number(b)) = self.lexer.get_token() {
+                        if let Some(Token::Number(b)) = self.lexer.next() {
                             let b = Self::parse_number(b);
                             Statement::Arithmetic(Box::new(maybe_arithmetic), operator, Box::new(b))
                         }
