@@ -51,7 +51,7 @@ pub fn output<T: core::fmt::Display>(out: T) {
 #[inline]
 pub fn debug_print<C: core::fmt::Display, I: core::fmt::Debug>(category: C, info: I) {
     if cfg!(debug_assertions) {
-        println!("{}{}{:?}",
+        println!("{}{} {:?}",
             Green.bold().paint("[ DEBUG ] "),
             Cyan.bold().paint(category),
             info,
