@@ -148,18 +148,15 @@ impl Lexer {
             '+' => Token::Plus,
 
             '-' => {
-                self.position += 1; // Increment so `peek_token` works properly for this use case.
+                // Attempts to create a negative number if possible, else creating a minus operator.
+                self.position += 1; let next_char = self.current();
+                self.position -= 1;
 
-                if let Some(Token::Number(_)) = self.peek_token() {
-                    // Create Negative Number
-                    self.position -= 1;
+                if next_char.is_numeric() {
                     self.create_number()
                 }
 
-                else {
-                    self.position -= 1;
-                    Token::Minus
-                }
+                else { Token::Minus }
             },
             
             '*' => Token::Star,
@@ -172,6 +169,7 @@ impl Lexer {
             c if c.is_numeric() => self.create_number(),
 
             c if c.is_alphabetic() => {
+                // Creates an identifier (word) of alphabetic characters.
                 let mut string = String::new();
                 string.push(c);
                 self.position += 1;

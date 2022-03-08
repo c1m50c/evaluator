@@ -35,12 +35,14 @@ pub fn output<T: core::fmt::Display>(out: T) {
 }
 
 
-/// Prints the `category` and `info` with special debug formatting, does not ensure application is in debug mode.
+/// Prints the `category` and `info` with special debug formatting.
 #[inline]
 pub fn debug_print(category: &str, info: &str) {
-    println!("{}{}{}",
-        Green.bold().paint("[ DEBUG ] "),
-        Cyan.bold().paint(format!("{} ", category).as_str()),
-        info,
-    );
+    if cfg!(debug_assertions) {
+        println!("{}{}{}",
+            Green.bold().paint("[ DEBUG ] "),
+            Cyan.bold().paint(format!("{} ", category).as_str()),
+            info,
+        );
+    }
 }

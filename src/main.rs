@@ -14,32 +14,24 @@ fn main() {
         let input = shell::input();
 
         let execution_thread = thread::spawn(move || {
-            // NOTE: The inner-code of this scope can be and should be cleaned up.
-
             let lexer = lexer::Lexer::new(input);
+            for t in lexer.clone() {
+                shell::debug_print(
+                    "Lexical Token", format!("{:?}", t).as_str()
+                );
+            }
 
-            let mut parser = parser::Parser::new(lexer.clone()); 
+            let mut parser = parser::Parser::new(lexer); 
             parser.parse();
 
             let statements = parser.get_statements();
-            let mut evaluator = eval::Evaluator::new(statements.clone());
-            
-            if cfg!(debug_assertions) {
-                for token in lexer {
-                    shell::debug_print(
-                        "Lexical Analysis",
-                        format!("{:?}", token).as_str()
-                    );
-                }
-
-                for statement in statements {
-                    shell::debug_print(
-                        "Parsing",
-                        format!("{:?}", statement).as_str()
-                    );
-                }
+            for s in statements.clone() {
+                shell::debug_print(
+                    "Parsing Statement", format!("{:?}", s).as_str()
+                );
             }
 
+            let mut evaluator = eval::Evaluator::new(statements);
             evaluator.evaluate();
         });
 

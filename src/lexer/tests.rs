@@ -13,10 +13,15 @@ fn token_word() {
 
 #[test]
 fn token_number() {
-    let mut lexer = Lexer::new("500 5.00".to_string());
+    let mut lexer = Lexer::new("500 5.00 -500 -5.00 - 3".to_string());
 
     assert_eq!(lexer.next(), Some(Token::Number("500".to_string())));
     assert_eq!(lexer.next(), Some(Token::Number("5.00".to_string())));
+    assert_eq!(lexer.next(), Some(Token::Number("-500".to_string())));
+    assert_eq!(lexer.next(), Some(Token::Number("-5.00".to_string())));
+    lexer.skip_token();
+    
+    assert_eq!(lexer.next(), Some(Token::Number("3".to_string())));
     assert_eq!(lexer.next(), None);
 }
 
