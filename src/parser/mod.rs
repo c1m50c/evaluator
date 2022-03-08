@@ -18,7 +18,11 @@ pub struct Parser {
 
 
 impl Parser {
-    /// Attempts to parse a `number` [`String`] to a 64-bit floating-point number, panicking if failing.
+    /// Attempts to parse a `number` [`String`] to a 64-bit floating-point number.
+    ///
+    /// # Panics
+    /// - If parsing the [`String`] into a [`f64`] fails.
+    #[inline]
     fn parse_number(number: String) -> Statement {
         let result = number.parse::<f64>()
             .unwrap_or_else(|_| shell_panic(
@@ -30,6 +34,7 @@ impl Parser {
     }
 
     /// Pops the last [`Statement`] within the `statements` field, panicking if no [`Statement`]s are contained within the field.
+    #[inline]
     fn pop_statement(&mut self) -> Statement {
         return self.statements.pop().unwrap();
     }
@@ -47,7 +52,7 @@ impl Parser {
     }
 
 
-    /// Returns the `statements` field of the [`Parser`].
+    /// Returns a clone of the `statements` field in the [`Parser`], should be used after calling the [`parse`] method.
     #[inline]
     pub fn get_statements(&self) -> Vec<Statement> {
         return self.statements.clone();
@@ -63,7 +68,7 @@ impl Parser {
 
                     match self.lexer.peek_token().unwrap_or(Token::Empty) {
                         // FIXME: Should be able to bind `_` to a variable to avoid this, apparently can't?
-                        // NOTE: This arm attempts to create an Arithmetic Statement if possible.
+                        // This arm attempts to create an Arithmetic Statement if possible.
                         _ if self.lexer.peek_token().unwrap().is_arithmetic_operator() => {
                             let operator = self.lexer.get_token().unwrap();
 

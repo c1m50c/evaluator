@@ -8,7 +8,7 @@ pub use err::*;
 
 /// Returns input from the standard input as a trimmed [`String`].
 /// 
-/// ## Panics
+/// # Panics
 /// - If `io::stdin().read_line()` Fails.
 #[inline]
 pub fn input() -> String {
@@ -27,6 +27,12 @@ pub fn input() -> String {
 }
 
 
+/// Outputs a value to the standard output, formatting it with a prefixed `>>>`.
+/// 
+/// # Example
+/// ```rust
+/// shell::output(5.34); // Will print out ">>> 5.34".
+/// ```
 #[inline]
 pub fn output<T: core::fmt::Display>(out: T) {
     println!("{}{}",
@@ -36,12 +42,18 @@ pub fn output<T: core::fmt::Display>(out: T) {
 
 
 /// Prints the `category` and `info` with special debug formatting.
+/// 
+/// # Example
+/// ```rust
+/// // Will output "[ DEBUG ] Lexical Token Token::Plus" if built with the debug flag.
+/// shell::debug_print("Lexical Token", Token::Plus);
+/// ```
 #[inline]
-pub fn debug_print(category: &str, info: &str) {
+pub fn debug_print<C: core::fmt::Display, I: core::fmt::Debug>(category: C, info: I) {
     if cfg!(debug_assertions) {
-        println!("{}{}{}",
+        println!("{}{}{:?}",
             Green.bold().paint("[ DEBUG ] "),
-            Cyan.bold().paint(format!("{} ", category).as_str()),
+            Cyan.bold().paint(category),
             info,
         );
     }

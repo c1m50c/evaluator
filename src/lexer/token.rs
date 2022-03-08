@@ -38,6 +38,13 @@ pub enum Token {
 
 impl Token {
     /// Checks the [`Token`] determining if it is a valid operator.
+    /// 
+    /// # Example
+    /// ```rust
+    /// let a = Token::Equal; let b = Token::Number(String::from("5"));
+    /// assert!(a.is_operator());
+    /// assert!(!b.is_operator());
+    /// ```
     #[inline]
     pub fn is_operator(self) -> bool {
         match self {
@@ -55,6 +62,13 @@ impl Token {
     }
 
     /// Checks the [`Token`] determining if it is a valid arithmetic operator.
+    /// 
+    /// # Example
+    /// ```rust
+    /// let a = Token::Plus; let b = Token::Equal;
+    /// assert!(a.is_arithmetic_operator());
+    /// assert!(!b.is_arithmetic_operator());
+    /// ```
     #[inline]
     pub fn is_arithmetic_operator(self) -> bool {
         match self {

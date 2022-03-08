@@ -30,7 +30,10 @@ impl Lexer {
         }
     }
 
-    /// Attempts to create a `Number` [`Token`] from the current `position` of the [`Lexer`], shell panicking if an error occurs.
+    /// Attempts to create a `Number` [`Token`] from the current `position` of the [`Lexer`].
+    /// 
+    /// # Panics
+    /// - If too many `.` characters are present within the [`Token`].
     fn create_number(&mut self) -> Token {
         let mut string = String::new();
         string.push(self.current());
@@ -56,7 +59,7 @@ impl Lexer {
 impl Lexer {
     /// Constructs a new [`Lexer`] from a `String`.
     /// 
-    /// ## Example
+    /// # Example
     /// ```rust
     /// let mut lexer = Lexer::new("Hello There".to_string());
     /// 
@@ -74,7 +77,7 @@ impl Lexer {
 
     /// Returns the `len` of the `characters` field in the [`Lexer`].
     /// 
-    /// ## Example
+    /// # Example
     /// ```rust
     /// let lexer = Lexer::new("Hello".to_string())
     /// assert_eq!(lexer.len(), 5);
@@ -86,7 +89,7 @@ impl Lexer {
 
     /// Returns the [`char`] at the index of the [`Lexer`]'s `position`.
     /// 
-    /// ## Example
+    /// # Example
     /// ```rust
     /// let lexer = Lexer::new("Yoyo".to_string());
     /// assert_eq!(lexer.current(), 'Y');
@@ -105,7 +108,7 @@ impl Lexer {
 
     /// Resets the [`Lexer`]'s `position` to zero.
     /// 
-    /// ## Example
+    /// # Example
     /// ```rust
     /// let mut lexer = Lexer::new("Two Words");
     /// let a = lexer.next();
@@ -128,7 +131,7 @@ impl Lexer {
 
     /// Returns the next [`Token`] within the [`Lexer`], equivalent to the `next()` method.
     /// 
-    /// ## Example
+    /// # Example
     /// ```rust
     /// let mut lexer = Lexer::new("WordA WordB".to_string());
     /// 
@@ -149,6 +152,7 @@ impl Lexer {
 
             '-' => {
                 // Attempts to create a negative number if possible, else creating a minus operator.
+
                 self.position += 1; let next_char = self.current();
                 self.position -= 1;
 
